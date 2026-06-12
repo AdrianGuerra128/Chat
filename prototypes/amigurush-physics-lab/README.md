@@ -1,4 +1,4 @@
-# AmiguRush Physics Lab v0.1
+# AmiguRush Physics Lab v0.2
 
 Laboratorio aislado para calibrar la física base de **AmiguRush** (arcade vertical tipo Flappy).
 No es el juego completo: es la herramienta que decide si el core físico puede sentirse adictivo, justo y viral.
@@ -34,8 +34,24 @@ python -m http.server 8000
 - Estados Ready / Playing / Dead con retry instantáneo.
 - Score, best score persistente (`localStorage`), último score.
 - Shake + flash al morir, causa de muerte visible.
-- Telemetría al morir: tiempo vivo, score, causa, velocidad vertical, distancia al centro del gap más cercano, preset usado.
-- Debug mode: hitboxes reales, FPS, velocidad vertical, valores actuales, línea central del próximo gap.
+- Telemetría al morir: tiempo vivo, score, causa, velocidad vertical, distancia al centro del gap, **gap shift**, **veredicto de fairness**, preset usado.
+- Debug mode: hitboxes reales, FPS, velocidad vertical, valores actuales, línea central del próximo gap (azul), línea del `prevGapCenter` (naranja punteada), `maxGapShift`, `spawnGapDistance`.
+
+## v0.2 — Fair Gap Calibration
+
+**La física base no cambió.** Misma gravedad, flapImpulse, maxFallSpeed, hitboxPadding, characterRadius.
+Solo cambió cómo se generan los obstáculos para que el juego sea más justo y medible.
+
+### `maxGapShift`
+Máximo salto vertical en píxeles entre el centro del gap anterior y el nuevo. Sin este parámetro, dos gaps consecutivos podían estar en extremos opuestos del nivel, haciendo imposible reaccionar. Con `maxGapShift`, la dificultad es proporcional a la velocidad y el tiempo de reacción disponible.
+
+### `spawnGapDistance`
+Distancia en píxeles entre spawns de obstáculos. En v0.1 el spawn era por tiempo (`spawnInterval`), lo que causaba que a mayor `worldSpeed` los obstáculos aparecieran más separados visualmente. Con spawn por distancia, el espacio entre obstáculos es constante en pantalla independientemente de la velocidad del mundo.
+
+### Veredicto de fairness al morir
+La pantalla de muerte ahora incluye:
+- **Gap shift**: cuántos píxeles saltó el gap respecto al anterior.
+- **Fairness**: `Justa` / `Margen mínimo` / `Shift extremo`.
 
 ## Presets
 
@@ -47,11 +63,15 @@ python -m http.server 8000
 | worldSpeed (px/s) | 140 | 180 | 240 | 200 |
 | gapSize (px) | 200 | 155 | 125 | 145 |
 | obstacleWidth (px) | 64 | 72 | 80 | 72 |
-| spawnInterval (s) | 1.70 | 1.35 | 1.05 | 1.25 |
+| spawnGapDistance (px) | 240 | 245 | 250 | 250 |
+| maxGapShift (px) | 120 | 135 | 95 | 125 |
 | hitboxPadding (px) | 10 | 8 | 5 | 9 |
 | characterRadius (px) | 17 | 18 | 19 | 18 |
 | ceilingDeath | no | no | sí | no |
 | floorDeath | sí | sí | sí | sí |
+
+> Nota: `spawnInterval` se mantiene en config solo como documentación legacy.
+> El spawn real usa `spawnGapDistance`.
 
 Ajustar cualquier slider tras aplicar un preset lo marca como `(custom)` para que la telemetría refleje que los valores ya no son los del preset puro.
 

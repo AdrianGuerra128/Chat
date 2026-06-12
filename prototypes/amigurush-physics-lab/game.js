@@ -1,9 +1,10 @@
 "use strict";
 
 /* ============================================================
- * AmiguRush Physics Lab v0.1
+ * AmiguRush Physics Lab v0.2
  * Laboratorio aislado para calibrar la física base del juego.
  * Sin frameworks, sin assets externos. Canvas + JS puro.
+ * v0.2: Fair Gap Calibration — spawn por distancia, maxGapShift.
  * ============================================================ */
 
 // ---------- Constantes del mundo ----------
@@ -15,18 +16,20 @@ const MAX_FRAME_TIME = 0.25; // clamp para evitar espiral de la muerte en pesta�
 
 // ---------- Configuración de física (mutable en vivo) ----------
 const config = {
-  gravity: 2200,        // px/s²
-  flapImpulse: -650,    // px/s
-  maxFallSpeed: 900,    // px/s
-  worldSpeed: 180,      // px/s
-  gapSize: 155,         // px
-  obstacleWidth: 72,    // px
-  spawnInterval: 1.35,  // s
-  hitboxPadding: 8,     // px (reduce la hitbox: muerte más justa)
-  characterRadius: 18,  // px
+  gravity: 2200,           // px/s²
+  flapImpulse: -650,       // px/s
+  maxFallSpeed: 900,       // px/s
+  worldSpeed: 180,         // px/s
+  gapSize: 155,            // px
+  obstacleWidth: 72,       // px
+  spawnInterval: 1.35,     // s (legacy, no controla spawn — ver spawnGapDistance)
+  hitboxPadding: 8,        // px (reduce la hitbox: muerte más justa)
+  characterRadius: 18,     // px
   ceilingDeath: false,
   floorDeath: true,
   debugMode: false,
+  maxGapShift: 135,        // px — máximo salto vertical entre gaps consecutivos
+  spawnGapDistance: 245,   // px — distancia entre spawns (reemplaza spawnInterval)
 };
 
 // Cada preset redefine todos los valores principales.
@@ -37,6 +40,7 @@ const PRESETS = {
     worldSpeed: 140, gapSize: 200, obstacleWidth: 64,
     spawnInterval: 1.7, hitboxPadding: 10, characterRadius: 17,
     ceilingDeath: false, floorDeath: true,
+    maxGapShift: 120, spawnGapDistance: 240,
   },
   classic: {
     label: "Classic",
@@ -44,6 +48,7 @@ const PRESETS = {
     worldSpeed: 180, gapSize: 155, obstacleWidth: 72,
     spawnInterval: 1.35, hitboxPadding: 8, characterRadius: 18,
     ceilingDeath: false, floorDeath: true,
+    maxGapShift: 135, spawnGapDistance: 245,
   },
   brutal: {
     label: "Brutal",
@@ -51,6 +56,7 @@ const PRESETS = {
     worldSpeed: 240, gapSize: 125, obstacleWidth: 80,
     spawnInterval: 1.05, hitboxPadding: 5, characterRadius: 19,
     ceilingDeath: true, floorDeath: true,
+    maxGapShift: 95, spawnGapDistance: 250,
   },
   viral: {
     label: "Viral Candidate",
@@ -58,20 +64,22 @@ const PRESETS = {
     worldSpeed: 200, gapSize: 145, obstacleWidth: 72,
     spawnInterval: 1.25, hitboxPadding: 9, characterRadius: 18,
     ceilingDeath: false, floorDeath: true,
+    maxGapShift: 125, spawnGapDistance: 250,
   },
 };
 
 // Definición de sliders del panel: [clave, min, max, step]
 const SLIDER_DEFS = [
-  ["gravity",        800, 4000, 50],
-  ["flapImpulse",  -1200, -200, 10],
-  ["maxFallSpeed",   300, 1600, 25],
-  ["worldSpeed",      60,  420, 10],
-  ["gapSize",         80,  300, 5],
-  ["obstacleWidth",   30,  140, 2],
-  ["spawnInterval",  0.6,  3.0, 0.05],
-  ["hitboxPadding",    0,   20, 1],
-  ["characterRadius",  8,   40, 1],
+  ["gravity",           800, 4000, 50],
+  ["flapImpulse",     -1200, -200, 10],
+  ["maxFallSpeed",      300, 1600, 25],
+  ["worldSpeed",         60,  420, 10],
+  ["gapSize",            80,  300, 5],
+  ["obstacleWidth",      30,  140, 2],
+  ["spawnGapDistance",  150,  500, 5],
+  ["maxGapShift",        40,  400, 5],
+  ["hitboxPadding",       0,   20, 1],
+  ["characterRadius",     8,   40, 1],
 ];
 
 // ---------- Estado del juego ----------
@@ -81,17 +89,19 @@ const game = {
   state: STATE.READY,
   y: H * 0.45,
   vy: 0,
-  obstacles: [],       // { x, gapCenter, passed }
-  spawnTimer: 0,
+  obstacles: [],           // { x, gapCenter, prevGapCenter, gapShift, passed }
+  spawnTimer: 0,           // legacy, no usado para spawn
+  spawnDistanceLeft: 0,    // distancia restante hasta próximo spawn
+  lastGapCenter: H / 2,   // último gapCenter spawneado (para maxGapShift)
   score: 0,
   best: 0,
   last: null,
   timeAlive: 0,
   activePreset: "classic",
-  presetDirty: false,  // true si se ajustó algo manualmente tras aplicar preset
-  death: null,         // telemetría de la última muerte
+  presetDirty: false,      // true si se ajustó algo manualmente tras aplicar preset
+  death: null,             // telemetría de la última muerte
   flapQueued: false,
-  bobPhase: 0,         // animación idle en READY
+  bobPhase: 0,             // animación idle en READY
 };
 
 // ---------- DOM ----------
@@ -177,7 +187,7 @@ function buildControls() {
 }
 
 function formatValue(key, v) {
-  return key === "spawnInterval" ? v.toFixed(2) + "s" : String(Math.round(v));
+  return String(Math.round(v));
 }
 
 function markPresetDirty() {
@@ -269,6 +279,8 @@ function resetRun() {
   game.vy = 0;
   game.obstacles = [];
   game.spawnTimer = 0;
+  game.spawnDistanceLeft = 0;
+  game.lastGapCenter = H / 2;
   game.score = 0;
   game.death = null;
   updateHud();
@@ -282,12 +294,28 @@ function die(cause) {
     saveBest();
   }
 
+  const gapDist = nearestGapDistance();
+  const nearest = game.obstacles.find((o) => !o.passed && o.x + config.obstacleWidth >= CHARACTER_X)
+    || game.obstacles[game.obstacles.length - 1];
+  const gapShift = nearest ? nearest.gapShift : null;
+
+  let fairVerdict;
+  if (gapShift !== null && gapShift > config.maxGapShift + 1) {
+    fairVerdict = "Shift extremo";
+  } else if (gapDist !== null && Math.abs(gapDist) <= hitboxRadius() + 8) {
+    fairVerdict = "Margen mínimo";
+  } else {
+    fairVerdict = "Justa";
+  }
+
   game.death = {
     cause,
     score: game.score,
     timeAlive: game.timeAlive,
     vyAtDeath: game.vy,
-    gapDistance: nearestGapDistance(),
+    gapDistance: gapDist,
+    gapShift,
+    fairVerdict,
     preset: PRESETS[game.activePreset].label + (game.presetDirty ? " (custom)" : ""),
   };
 
@@ -326,13 +354,21 @@ function showDeathOverlay() {
     ? `Dist. centro gap: <b>${d.gapDistance >= 0 ? "+" : ""}${d.gapDistance.toFixed(0)} px</b> (${d.gapDistance > 0 ? "abajo" : "arriba"})`
     : "Dist. centro gap: <b>n/a</b>";
 
-  telemetryEl.innerHTML = [
+  const shiftLine = d.gapShift !== null
+    ? `Gap shift: <b>${d.gapShift.toFixed(0)} px</b> / max <b>${config.maxGapShift}</b>`
+    : "";
+
+  const rows = [
     `Tiempo vivo: <b>${d.timeAlive.toFixed(2)} s</b>`,
     `Score: <b>${d.score}</b>`,
     `Vel. vertical: <b>${d.vyAtDeath.toFixed(0)} px/s</b>`,
     gapLine,
+    shiftLine,
+    `Fairness: <b>${d.fairVerdict}</b>`,
     `Preset: <b>${d.preset}</b>`,
-  ].join("<br>");
+  ].filter(Boolean);
+
+  telemetryEl.innerHTML = rows.join("<br>");
 
   deathOverlay.classList.remove("hidden");
 }
@@ -346,11 +382,11 @@ function physicsStep(dt) {
   if (game.vy > config.maxFallSpeed) game.vy = config.maxFallSpeed;
   game.y += game.vy * dt;
 
-  // Spawn de obstáculos
-  game.spawnTimer -= dt;
-  if (game.spawnTimer <= 0) {
-    game.spawnTimer += config.spawnInterval;
+  // Spawn de obstáculos por distancia recorrida (v0.2: reemplaza spawnInterval)
+  game.spawnDistanceLeft -= config.worldSpeed * dt;
+  while (game.spawnDistanceLeft <= 0) {
     spawnObstacle();
+    game.spawnDistanceLeft += config.spawnGapDistance;
   }
 
   // Mover obstáculos y contar score
@@ -402,12 +438,28 @@ function hitboxRadius() {
 }
 
 function spawnObstacle() {
-  const margin = 60; // el centro del gap nunca queda pegado a los bordes
+  const margin = 60;
   const half = config.gapSize / 2;
   const min = margin + half;
   const max = H - margin - half;
-  const gapCenter = min + Math.random() * Math.max(0, max - min);
-  game.obstacles.push({ x: W + 10, gapCenter, passed: false });
+
+  // Clampear lastGapCenter al rango válido antes de calcular el shift
+  const base = Math.max(min, Math.min(max, game.lastGapCenter));
+
+  // El nuevo centro solo puede alejarse maxGapShift del anterior
+  const low  = Math.max(min, base - config.maxGapShift);
+  const high = Math.min(max, base + config.maxGapShift);
+  const gapCenter = low + Math.random() * (high - low);
+  const gapShift  = Math.abs(gapCenter - base);
+
+  game.obstacles.push({
+    x: W + 10,
+    gapCenter,
+    prevGapCenter: base,
+    gapShift,
+    passed: false,
+  });
+  game.lastGapCenter = gapCenter;
 }
 
 function circleHitsObstacle(o, r) {
@@ -536,18 +588,30 @@ function drawDebug() {
   // Línea central del gap del próximo obstáculo (el primero no pasado)
   const next = game.obstacles.find((o) => !o.passed && o.x + config.obstacleWidth >= CHARACTER_X);
   if (next) {
+    // Línea azul: gapCenter actual
     ctx.strokeStyle = "#58a6ff";
     ctx.setLineDash([6, 6]);
     ctx.beginPath();
     ctx.moveTo(0, next.gapCenter);
     ctx.lineTo(W, next.gapCenter);
     ctx.stroke();
+    // Línea naranja punteada: prevGapCenter (de dónde vino el gap anterior)
+    if (next.prevGapCenter !== undefined) {
+      ctx.strokeStyle = "#ff9640";
+      ctx.setLineDash([4, 8]);
+      ctx.beginPath();
+      ctx.moveTo(0, next.prevGapCenter);
+      ctx.lineTo(W, next.prevGapCenter);
+      ctx.stroke();
+    }
     ctx.setLineDash([]);
   }
 }
 
 function updateDebugPanel() {
   if (!config.debugMode) return;
+  const next = game.obstacles.find((o) => !o.passed && o.x + config.obstacleWidth >= CHARACTER_X);
+  const spawnSecs = (config.spawnGapDistance / config.worldSpeed).toFixed(2);
   debugPanel.textContent = [
     `FPS: ${fps.toFixed(0)}`,
     `vy: ${game.vy.toFixed(0)} px/s`,
@@ -558,7 +622,9 @@ function updateDebugPanel() {
     `maxFall: ${config.maxFallSpeed}`,
     `worldSpeed: ${config.worldSpeed}`,
     `gap: ${config.gapSize}  width: ${config.obstacleWidth}`,
-    `spawn: ${config.spawnInterval.toFixed(2)}s`,
+    `spawnDist: ${config.spawnGapDistance} px (~${spawnSecs}s)`,
+    `maxGapShift: ${config.maxGapShift} px`,
+    next ? `next gapShift: ${next.gapShift.toFixed(0)} px` : `next gapShift: -`,
     `obstacles: ${game.obstacles.length}`,
   ].join("\n");
 }
