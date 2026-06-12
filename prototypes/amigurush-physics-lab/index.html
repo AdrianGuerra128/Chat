@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>AmiguRush Physics Lab v0.1</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="game-wrapper">
+      <div class="canvas-frame" id="canvasFrame">
+        <canvas id="game" width="390" height="844"></canvas>
+
+        <div class="hud">
+          <div class="hud-top">
+            <div class="score" id="scoreLabel">0</div>
+            <div class="best-row">
+              <span>Best: <b id="bestLabel">0</b></span>
+              <span>Last: <b id="lastLabel">-</b></span>
+            </div>
+            <div class="preset-tag" id="presetTag">Preset: Classic</div>
+          </div>
+
+          <div class="state-overlay" id="readyOverlay">
+            <div class="state-card">
+              <h1>AmiguRush</h1>
+              <p>Physics Lab v0.1</p>
+              <p class="hint">Tap / Click / Space para impulsar</p>
+              <p class="hint">Toca para empezar</p>
+            </div>
+          </div>
+
+          <div class="state-overlay hidden" id="deathOverlay">
+            <div class="state-card death-card">
+              <h2>Has muerto</h2>
+              <div class="death-cause" id="deathCause">-</div>
+              <div class="telemetry" id="telemetry"></div>
+              <p class="hint">Tap / Click / Space para reintentar</p>
+            </div>
+          </div>
+
+          <div class="flash" id="flash"></div>
+        </div>
+
+        <div class="debug-panel hidden" id="debugPanel"></div>
+      </div>
+    </div>
+
+    <div class="control-panel" id="controlPanel">
+      <h2>Physics Lab Controls</h2>
+
+      <div class="presets">
+        <button data-preset="soft">Soft</button>
+        <button data-preset="classic">Classic</button>
+        <button data-preset="brutal">Brutal</button>
+        <button data-preset="viral">Viral Candidate</button>
+      </div>
+
+      <div class="control-grid" id="controlGrid"></div>
+
+      <div class="toggle-row">
+        <label><input type="checkbox" id="ceilingDeath" /> Ceiling Death</label>
+        <label><input type="checkbox" id="floorDeath" /> Floor Death</label>
+        <label><input type="checkbox" id="debugMode" /> Debug Mode</label>
+      </div>
+
+      <button class="reset-btn" id="resetBest">Reset Best Score</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
