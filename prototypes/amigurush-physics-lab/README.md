@@ -53,19 +53,25 @@ La pantalla de muerte ahora incluye:
 - **Gap shift**: cuántos píxeles saltó el gap respecto al anterior.
 - **Fairness**: `Justa` / `Margen mínimo` / `Shift extremo`.
 
+## v0.2.1 — Preset & Early Difficulty Calibration
+
+v0.2.1 calibra dificultad inicial y presets; no cambia el sistema de fairness ni la física del motor.
+
+Objetivo: que **Classic** sea la base jugable real (jugador nuevo logra score 2–5 en los primeros intentos), **Viral Candidate** sea más intenso que Classic sin ser un muro, **Soft** siga siendo onboarding sin ser piloto automático, y **Brutal** quede como modo castigo. El config por defecto ahora coincide con Classic.
+
 ## Presets
 
 | Parámetro | Soft | Classic | Brutal | Viral Candidate |
 |---|---|---|---|---|
-| gravity (px/s²) | 1700 | 2200 | 2700 | 2400 |
-| flapImpulse (px/s) | -520 | -650 | -760 | -690 |
-| maxFallSpeed (px/s) | 720 | 900 | 1100 | 950 |
-| worldSpeed (px/s) | 140 | 180 | 240 | 200 |
-| gapSize (px) | 200 | 155 | 125 | 145 |
+| gravity (px/s²) | 1700 | 2200 | 2700 | 2350 |
+| flapImpulse (px/s) | -520 | -650 | -760 | -680 |
+| maxFallSpeed (px/s) | 720 | 900 | 1100 | 930 |
+| worldSpeed (px/s) | 150 | 170 | 230 | 185 |
+| gapSize (px) | 190 | 175 | 130 | 160 |
 | obstacleWidth (px) | 64 | 72 | 80 | 72 |
-| spawnGapDistance (px) | 240 | 245 | 250 | 250 |
-| maxGapShift (px) | 120 | 135 | 95 | 125 |
-| hitboxPadding (px) | 10 | 8 | 5 | 9 |
+| spawnGapDistance (px) | 255 | 275 | 265 | 265 |
+| maxGapShift (px) | 115 | 115 | 90 | 115 |
+| hitboxPadding (px) | 10 | 10 | 6 | 9 |
 | characterRadius (px) | 17 | 18 | 19 | 18 |
 | ceilingDeath | no | no | sí | no |
 | floorDeath | sí | sí | sí | sí |

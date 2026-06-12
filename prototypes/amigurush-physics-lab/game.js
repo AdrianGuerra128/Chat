@@ -19,17 +19,17 @@ const config = {
   gravity: 2200,           // px/s²
   flapImpulse: -650,       // px/s
   maxFallSpeed: 900,       // px/s
-  worldSpeed: 180,         // px/s
-  gapSize: 155,            // px
+  worldSpeed: 170,         // px/s
+  gapSize: 175,            // px
   obstacleWidth: 72,       // px
-  spawnInterval: 1.35,     // s (legacy, no controla spawn — ver spawnGapDistance)
-  hitboxPadding: 8,        // px (reduce la hitbox: muerte más justa)
+  spawnInterval: 1.6,      // s (legacy, no controla spawn — ver spawnGapDistance)
+  hitboxPadding: 10,       // px (reduce la hitbox: muerte más justa)
   characterRadius: 18,     // px
   ceilingDeath: false,
   floorDeath: true,
   debugMode: false,
-  maxGapShift: 135,        // px — máximo salto vertical entre gaps consecutivos
-  spawnGapDistance: 245,   // px — distancia entre spawns (reemplaza spawnInterval)
+  maxGapShift: 115,        // px — máximo salto vertical entre gaps consecutivos
+  spawnGapDistance: 275,   // px — distancia entre spawns (reemplaza spawnInterval)
 };
 
 // Cada preset redefine todos los valores principales.
@@ -37,34 +37,34 @@ const PRESETS = {
   soft: {
     label: "Soft",
     gravity: 1700, flapImpulse: -520, maxFallSpeed: 720,
-    worldSpeed: 140, gapSize: 200, obstacleWidth: 64,
+    worldSpeed: 150, gapSize: 190, obstacleWidth: 64,
     spawnInterval: 1.7, hitboxPadding: 10, characterRadius: 17,
     ceilingDeath: false, floorDeath: true,
-    maxGapShift: 120, spawnGapDistance: 240,
+    maxGapShift: 115, spawnGapDistance: 255,
   },
   classic: {
     label: "Classic",
     gravity: 2200, flapImpulse: -650, maxFallSpeed: 900,
-    worldSpeed: 180, gapSize: 155, obstacleWidth: 72,
-    spawnInterval: 1.35, hitboxPadding: 8, characterRadius: 18,
+    worldSpeed: 170, gapSize: 175, obstacleWidth: 72,
+    spawnInterval: 1.6, hitboxPadding: 10, characterRadius: 18,
     ceilingDeath: false, floorDeath: true,
-    maxGapShift: 135, spawnGapDistance: 245,
+    maxGapShift: 115, spawnGapDistance: 275,
   },
   brutal: {
     label: "Brutal",
     gravity: 2700, flapImpulse: -760, maxFallSpeed: 1100,
-    worldSpeed: 240, gapSize: 125, obstacleWidth: 80,
-    spawnInterval: 1.05, hitboxPadding: 5, characterRadius: 19,
+    worldSpeed: 230, gapSize: 130, obstacleWidth: 80,
+    spawnInterval: 1.15, hitboxPadding: 6, characterRadius: 19,
     ceilingDeath: true, floorDeath: true,
-    maxGapShift: 95, spawnGapDistance: 250,
+    maxGapShift: 90, spawnGapDistance: 265,
   },
   viral: {
     label: "Viral Candidate",
-    gravity: 2400, flapImpulse: -690, maxFallSpeed: 950,
-    worldSpeed: 200, gapSize: 145, obstacleWidth: 72,
-    spawnInterval: 1.25, hitboxPadding: 9, characterRadius: 18,
+    gravity: 2350, flapImpulse: -680, maxFallSpeed: 930,
+    worldSpeed: 185, gapSize: 160, obstacleWidth: 72,
+    spawnInterval: 1.43, hitboxPadding: 9, characterRadius: 18,
     ceilingDeath: false, floorDeath: true,
-    maxGapShift: 125, spawnGapDistance: 250,
+    maxGapShift: 115, spawnGapDistance: 265,
   },
 };
 
