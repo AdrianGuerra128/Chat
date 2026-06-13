@@ -90,6 +90,14 @@ Microajustes detectados por QA visual de v0.4. **Sin cambios de física, presets
 - **Paleta más cálida**: gradiente de fondo hacia morado sutil (navy frío → violeta oscuro), conservando contraste. El personaje naranja no cambió.
 - **Partículas de muerte 30% más grandes** para que sobrevivan al blur del overlay.
 
+## v0.5 — Obstacle Identity Pass
+
+Siguiendo `ART_DIRECTION.md` (dirección D), se mejoró únicamente la identidad visual del remate de los obstáculos en la cara del gap. **Sin cambios de física, presets, fairness, spawn, score, collision, hitbox, telemetría, personaje, fondo, HUD ni overlay de muerte.**
+
+- **Remate de gap tipo "puntada gorda"**: el borde del gap ahora muestra una fila de puntadas más grandes y traslapadas (radio 6→8, separación 14px), con un hilo guía y un ojal interior por puntada que refuerza la lectura de "tejido/crochet".
+- **Cuerpo de columna intacto**: `drawYarnColumn` no cambió; las filas de lana, hilos laterales y color base (`#4a4374`) siguen iguales.
+- **Gap igual de limpio**: los remates crecen hacia el cuerpo del obstáculo (nunca hacia el hueco), por lo que el hueco sigue tan legible y justo como antes.
+
 ## Presets
 
 | Parámetro | Soft | Classic | Brutal | Viral Candidate |

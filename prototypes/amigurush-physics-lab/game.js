@@ -636,13 +636,40 @@ function drawYarnColumn(x, y, w, h) {
   ctx.stroke();
 }
 
-// Fila de semicírculos centrados en el borde del gap: remate de crochet
+// Remate tipo ovillo/puntada gorda en el borde del gap: trama de crochet
+// más gruesa. Los bumps crecen hacia el cuerpo del obstáculo (nunca hacia
+// el hueco), así que el gap sigue tan limpio y legible como antes.
 function drawStitchEdge(x, y, w, bumpsUp) {
+  const r = 8;
+  const spacing = 14;
+
+  // Hilo guía bajo los remates, mismo tono que los bordes laterales tejidos
+  ctx.strokeStyle = "rgba(155, 138, 210, 0.4)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(x + 2, y);
+  ctx.lineTo(x + w - 2, y);
+  ctx.stroke();
+
+  // Remates gordos (puntadas) traslapados, tipo cadena de ovillo
   ctx.fillStyle = "#9b8ed0";
   ctx.beginPath();
-  for (let xx = x + 4; xx + 12 <= x + w - 2; xx += 12) {
-    ctx.moveTo(xx + 12, y);
-    ctx.arc(xx + 6, y, 6, 0, Math.PI, !bumpsUp);
+  for (let xx = x + 4; xx + spacing <= x + w - 2; xx += spacing) {
+    const cx = xx + spacing / 2;
+    ctx.moveTo(cx + r, y);
+    ctx.arc(cx, y, r, 0, Math.PI, !bumpsUp);
+  }
+  ctx.fill();
+
+  // Ojal interior de cada puntada, con el tono del cuerpo de la columna
+  ctx.fillStyle = "#4a4374";
+  ctx.beginPath();
+  const innerR = r * 0.4;
+  const innerOffset = bumpsUp ? innerR + 2 : -(innerR + 2);
+  for (let xx = x + 4; xx + spacing <= x + w - 2; xx += spacing) {
+    const cx = xx + spacing / 2;
+    ctx.moveTo(cx + innerR, y + innerOffset);
+    ctx.arc(cx, y + innerOffset, innerR, 0, Math.PI * 2);
   }
   ctx.fill();
 }
