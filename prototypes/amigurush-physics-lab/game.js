@@ -328,7 +328,7 @@ function die(cause) {
   updateHud();
 
   // Feedback: partículas + flash + shake
-  spawnParticles(CHARACTER_X, game.y, 18, ["#ffb35c", "#ff5c6c", "#e8eaf2"], 260, 0.6);
+  spawnParticles(CHARACTER_X, game.y, 18, ["#ffb35c", "#ff5c6c", "#e8eaf2"], 260, 0.6, 1.3);
   flashEl.classList.remove("active");
   void flashEl.offsetWidth; // reinicia la animación
   flashEl.classList.add("active");
@@ -382,7 +382,7 @@ function showDeathOverlay() {
 // ---------- Partículas (solo feedback visual: no tocan física ni gameplay) ----------
 const particles = [];
 
-function spawnParticles(x, y, count, colors, speed, life) {
+function spawnParticles(x, y, count, colors, speed, life, sizeScale = 1) {
   for (let i = 0; i < count; i++) {
     const a = Math.random() * Math.PI * 2;
     const s = speed * (0.35 + Math.random() * 0.65);
@@ -392,7 +392,7 @@ function spawnParticles(x, y, count, colors, speed, life) {
       vy: Math.sin(a) * s,
       life: 0,
       maxLife: life * (0.6 + Math.random() * 0.4),
-      size: 2 + Math.random() * 2.2,
+      size: (2 + Math.random() * 2.2) * sizeScale,
       color: colors[(Math.random() * colors.length) | 0],
     });
   }
@@ -556,14 +556,14 @@ function render() {
 
 function drawBackground() {
   const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, "#1a1e30");
-  grad.addColorStop(1, "#12141f");
+  grad.addColorStop(0, "#221d36");
+  grad.addColorStop(1, "#171225");
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  // Capa lejana de parallax: ovillos/colinas suaves en la base (muy tenues)
+  // Capa lejana de parallax: ovillos/colinas suaves en la base (tenues)
   const far = bgScroll * 0.15;
-  ctx.fillStyle = "rgba(83, 93, 140, 0.10)";
+  ctx.fillStyle = "rgba(108, 96, 158, 0.18)";
   for (let i = 0; i < 6; i++) {
     const x = wrapMod(i * 165 + 40 - far, W + 340) - 170;
     const r = 70 + (i % 3) * 32;
@@ -574,7 +574,7 @@ function drawBackground() {
 
   // Capa cercana de parallax: motas de lana flotantes (alpha bajo, no distraen)
   const near = bgScroll * 0.35;
-  ctx.fillStyle = "rgba(255, 211, 150, 0.06)";
+  ctx.fillStyle = "rgba(255, 211, 150, 0.12)";
   for (let i = 0; i < 14; i++) {
     const x = wrapMod(i * 97 + 31 - near, W + 60) - 30;
     const y = ((i * 167 + 80) % (H - 160)) + 60;
@@ -612,11 +612,11 @@ function drawObstacles() {
 // la hitbox sigue siendo el rectángulo completo de circleHitsObstacle)
 function drawYarnColumn(x, y, w, h) {
   if (h <= 0) return;
-  ctx.fillStyle = "#3f4569";
+  ctx.fillStyle = "#4a4374";
   roundRect(x, y, w, h, 8);
 
   // Filas de lana: curvas horizontales suaves, un solo stroke por columna
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+  ctx.strokeStyle = "rgba(255, 226, 200, 0.08)";
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   for (let yy = y + 6; yy < y + h - 4; yy += 8) {
@@ -626,7 +626,7 @@ function drawYarnColumn(x, y, w, h) {
   ctx.stroke();
 
   // Borde lateral tipo hilo
-  ctx.strokeStyle = "rgba(120, 132, 190, 0.35)";
+  ctx.strokeStyle = "rgba(155, 138, 210, 0.4)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(x + 1.5, y + 4);
@@ -638,11 +638,11 @@ function drawYarnColumn(x, y, w, h) {
 
 // Fila de semicírculos centrados en el borde del gap: remate de crochet
 function drawStitchEdge(x, y, w, bumpsUp) {
-  ctx.fillStyle = "#6a74a8";
+  ctx.fillStyle = "#9b8ed0";
   ctx.beginPath();
-  for (let xx = x + 4; xx + 9 <= x + w - 2; xx += 9) {
-    ctx.moveTo(xx + 9, y);
-    ctx.arc(xx + 4.5, y, 4.5, 0, Math.PI, !bumpsUp);
+  for (let xx = x + 4; xx + 12 <= x + w - 2; xx += 12) {
+    ctx.moveTo(xx + 12, y);
+    ctx.arc(xx + 6, y, 6, 0, Math.PI, !bumpsUp);
   }
   ctx.fill();
 }

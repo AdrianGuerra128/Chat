@@ -80,6 +80,16 @@ Identidad visual procedural, 100% Canvas 2D, sin imágenes ni assets externos. *
 - **Fondo con profundidad**: dos capas de parallax procedural (ovillos/colinas lejanas + motas de lana flotantes) que acompañan `worldSpeed` al jugar y derivan lento en menús. Alpha muy bajo para no competir con el gameplay.
 - **Partículas de paso más visibles**: ligeramente más grandes, más brillantes y de vida un poco más larga (Codex QA las reportó casi invisibles en v0.3).
 
+## v0.4.1 — Visual Microtuning
+
+Microajustes detectados por QA visual de v0.4. **Sin cambios de física, presets, fairness, spawn, score, collision, hitbox ni telemetría.**
+
+- **Label corregido**: `index.html` ya no dice "v0.2"; title y tarjeta inicial dicen v0.4.
+- **Parallax más visible**: alpha de ovillos 0.10→0.18 y de motas 0.06→0.12; ahora la profundidad se percibe sin competir con el gameplay.
+- **Obstáculos más crochet**: puntadas del borde del gap más grandes (radio 4.5→6) y más claras/cálidas; cuerpo y filas de lana con tono violeta cálido en lugar de gris frío.
+- **Paleta más cálida**: gradiente de fondo hacia morado sutil (navy frío → violeta oscuro), conservando contraste. El personaje naranja no cambió.
+- **Partículas de muerte 30% más grandes** para que sobrevivan al blur del overlay.
+
 ## Presets
 
 | Parámetro | Soft | Classic | Brutal | Viral Candidate |
