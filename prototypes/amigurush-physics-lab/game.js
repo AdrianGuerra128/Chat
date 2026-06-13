@@ -392,7 +392,7 @@ function spawnParticles(x, y, count, colors, speed, life) {
       vy: Math.sin(a) * s,
       life: 0,
       maxLife: life * (0.6 + Math.random() * 0.4),
-      size: 1.5 + Math.random() * 2,
+      size: 2 + Math.random() * 2.2,
       color: colors[(Math.random() * colors.length) | 0],
     });
   }
@@ -452,7 +452,7 @@ function physicsStep(dt) {
       o.passed = true;
       game.score++;
       scorePop();
-      spawnParticles(CHARACTER_X + 14, game.y, 8, ["#ffd76a", "#ffb35c"], 140, 0.45);
+      spawnParticles(CHARACTER_X + 14, game.y, 8, ["#ffe9a8", "#ffd76a", "#ffb35c"], 160, 0.55);
       updateHud();
     }
   }
@@ -539,6 +539,12 @@ function circleHitsRect(cx, cy, r, rx, ry, rw, rh) {
 }
 
 // ---------- Render ----------
+// Reloj y scroll puramente visuales (avanzan con tiempo de frame, nunca con física)
+let visualTime = 0;
+let bgScroll = 0;
+
+const wrapMod = (a, n) => ((a % n) + n) % n;
+
 function render() {
   ctx.clearRect(0, 0, W, H);
   drawBackground();
@@ -555,6 +561,28 @@ function drawBackground() {
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
+  // Capa lejana de parallax: ovillos/colinas suaves en la base (muy tenues)
+  const far = bgScroll * 0.15;
+  ctx.fillStyle = "rgba(83, 93, 140, 0.10)";
+  for (let i = 0; i < 6; i++) {
+    const x = wrapMod(i * 165 + 40 - far, W + 340) - 170;
+    const r = 70 + (i % 3) * 32;
+    ctx.beginPath();
+    ctx.arc(x, H + 18, r, Math.PI, 0);
+    ctx.fill();
+  }
+
+  // Capa cercana de parallax: motas de lana flotantes (alpha bajo, no distraen)
+  const near = bgScroll * 0.35;
+  ctx.fillStyle = "rgba(255, 211, 150, 0.06)";
+  for (let i = 0; i < 14; i++) {
+    const x = wrapMod(i * 97 + 31 - near, W + 60) - 30;
+    const y = ((i * 167 + 80) % (H - 160)) + 60;
+    ctx.beginPath();
+    ctx.arc(x, y, 2 + (i % 3), 0, Math.PI * 2);
+    ctx.fill();
+  }
+
   // Línea de piso sutil
   ctx.strokeStyle = "rgba(255,255,255,0.08)";
   ctx.lineWidth = 2;
@@ -570,15 +598,53 @@ function drawObstacles() {
     const gapBottom = o.gapCenter + config.gapSize / 2;
     const w = config.obstacleWidth;
 
-    ctx.fillStyle = "#3b4263";
-    roundRect(o.x, -8, w, gapTop + 8, 8);
-    roundRect(o.x, gapBottom, w, H - gapBottom + 8, 8);
+    drawYarnColumn(o.x, -8, w, gapTop + 8);
+    drawYarnColumn(o.x, gapBottom, w, H - gapBottom + 8);
 
-    // Bordes del gap resaltados (legibilidad del hueco)
-    ctx.fillStyle = "#535d8c";
-    ctx.fillRect(o.x, gapTop - 6, w, 6);
-    ctx.fillRect(o.x, gapBottom, w, 6);
+    // Borde del gap con puntadas tipo crochet (legibilidad del hueco intacta:
+    // las puntadas se centran en la línea del borde, solo decoración)
+    drawStitchEdge(o.x, gapTop, w, false);
+    drawStitchEdge(o.x, gapBottom, w, true);
   }
+}
+
+// Columna de obstáculo con textura de tejido procedural (solo visual:
+// la hitbox sigue siendo el rectángulo completo de circleHitsObstacle)
+function drawYarnColumn(x, y, w, h) {
+  if (h <= 0) return;
+  ctx.fillStyle = "#3f4569";
+  roundRect(x, y, w, h, 8);
+
+  // Filas de lana: curvas horizontales suaves, un solo stroke por columna
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let yy = y + 6; yy < y + h - 4; yy += 8) {
+    ctx.moveTo(x + 3, yy);
+    ctx.quadraticCurveTo(x + w / 2, yy + 2.5, x + w - 3, yy);
+  }
+  ctx.stroke();
+
+  // Borde lateral tipo hilo
+  ctx.strokeStyle = "rgba(120, 132, 190, 0.35)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x + 1.5, y + 4);
+  ctx.lineTo(x + 1.5, y + h - 4);
+  ctx.moveTo(x + w - 1.5, y + 4);
+  ctx.lineTo(x + w - 1.5, y + h - 4);
+  ctx.stroke();
+}
+
+// Fila de semicírculos centrados en el borde del gap: remate de crochet
+function drawStitchEdge(x, y, w, bumpsUp) {
+  ctx.fillStyle = "#6a74a8";
+  ctx.beginPath();
+  for (let xx = x + 4; xx + 9 <= x + w - 2; xx += 9) {
+    ctx.moveTo(xx + 9, y);
+    ctx.arc(xx + 4.5, y, 4.5, 0, Math.PI, !bumpsUp);
+  }
+  ctx.fill();
 }
 
 function roundRect(x, y, w, h, r) {
@@ -608,25 +674,70 @@ function drawCharacter() {
   ctx.rotate(tilt);
   ctx.scale(scaleX, scaleY);
 
-  // Cuerpo: círculo con "puntadas" para sugerir amigurumi sin arte final
+  // Hebra de hilo suelta (cola): detrás del cuerpo, ondea con reloj visual
+  const wag = Math.sin(visualTime * 6) * 0.25;
+  ctx.strokeStyle = "#d98c3f";
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(-R * 0.85, R * 0.35);
+  ctx.quadraticCurveTo(
+    -R * 1.6, R * (0.7 + wag),
+    -R * 2.1, R * (0.45 + wag * 1.8)
+  );
+  ctx.stroke();
+  // Nudito al final de la hebra
+  ctx.fillStyle = "#d98c3f";
+  ctx.beginPath();
+  ctx.arc(-R * 2.1, R * (0.45 + wag * 1.8), 2.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Cuerpo: bola de lana amigurumi
   ctx.fillStyle = "#ffb35c";
   ctx.beginPath();
   ctx.arc(0, 0, R, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = "rgba(0,0,0,0.18)";
+  // Sombreado inferior suave (volumen)
+  ctx.fillStyle = "rgba(120, 60, 10, 0.16)";
+  ctx.beginPath();
+  ctx.arc(0, R * 0.35, R * 0.92, Math.PI * 0.15, Math.PI * 0.85);
+  ctx.fill();
+
+  // Textura de tejido: anillos concéntricos punteados (puntadas)
+  ctx.strokeStyle = "rgba(0,0,0,0.22)";
   ctx.lineWidth = 1.5;
-  for (let i = 1; i <= 2; i++) {
+  ctx.setLineDash([3, 4]);
+  for (let i = 1; i <= 3; i++) {
     ctx.beginPath();
-    ctx.arc(0, 0, R * (i / 3), 0, Math.PI * 2);
+    ctx.arc(0, 0, R * (i / 3.6), 0, Math.PI * 2);
     ctx.stroke();
   }
+  ctx.setLineDash([]);
 
-  // Ojos
+  // Contorno tipo hilo (yarn outline)
+  ctx.strokeStyle = "#d98c3f";
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(0, 0, R - 1, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Ojos con brillo
   ctx.fillStyle = "#22243a";
   ctx.beginPath();
-  ctx.arc(R * 0.35, -R * 0.2, R * 0.14, 0, Math.PI * 2);
-  ctx.arc(R * 0.72, -R * 0.2, R * 0.14, 0, Math.PI * 2);
+  ctx.arc(R * 0.35, -R * 0.2, R * 0.15, 0, Math.PI * 2);
+  ctx.arc(R * 0.72, -R * 0.2, R * 0.15, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "rgba(255,255,255,0.9)";
+  ctx.beginPath();
+  ctx.arc(R * 0.31, -R * 0.26, R * 0.05, 0, Math.PI * 2);
+  ctx.arc(R * 0.68, -R * 0.26, R * 0.05, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Mejilla sutil
+  ctx.fillStyle = "rgba(255, 110, 110, 0.22)";
+  ctx.beginPath();
+  ctx.arc(R * 0.5, R * 0.18, R * 0.18, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.restore();
@@ -731,6 +842,9 @@ function frame(now) {
     game.flapVisualTimer = Math.max(0, game.flapVisualTimer - frameTime);
   }
   updateParticles(frameTime);
+  visualTime += frameTime;
+  // El parallax acompaña la velocidad del mundo al jugar; deriva lenta en menús
+  bgScroll += frameTime * (game.state === STATE.PLAYING ? config.worldSpeed : 24);
 
   render();
   updateDebugPanel();

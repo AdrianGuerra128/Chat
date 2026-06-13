@@ -71,6 +71,15 @@ Capa de feedback puramente visual. **No cambia física, presets, fairness ni dif
 
 Las partículas viven en canvas, sin imágenes ni assets, avanzan con tiempo de frame (no con el paso de física) y se limpian al reiniciar el run.
 
+## v0.4 — Amigurumi Identity Mini-Pass
+
+Identidad visual procedural, 100% Canvas 2D, sin imágenes ni assets externos. **Sin cambios de física, presets, fairness, spawn, score, hitbox ni telemetría.**
+
+- **Personaje crochet**: contorno tipo hilo, anillos de puntadas punteados, sombreado de volumen, ojos con brillo, mejilla sutil y una hebra de lana suelta que ondea (animada con reloj visual, no con física).
+- **Obstáculos tejidos**: textura procedural de filas de lana, bordes laterales tipo hilo y remate de puntadas (semicírculos) en los bordes del gap. Las puntadas decoran hacia el interior del obstáculo: el hueco sigue tan legible y justo como antes.
+- **Fondo con profundidad**: dos capas de parallax procedural (ovillos/colinas lejanas + motas de lana flotantes) que acompañan `worldSpeed` al jugar y derivan lento en menús. Alpha muy bajo para no competir con el gameplay.
+- **Partículas de paso más visibles**: ligeramente más grandes, más brillantes y de vida un poco más larga (Codex QA las reportó casi invisibles en v0.3).
+
 ## Presets
 
 | Parámetro | Soft | Classic | Brutal | Viral Candidate |
