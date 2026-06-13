@@ -59,6 +59,18 @@ v0.2.1 calibra dificultad inicial y presets; no cambia el sistema de fairness ni
 
 Objetivo: que **Classic** sea la base jugable real (jugador nuevo logra score 2–5 en los primeros intentos), **Viral Candidate** sea más intenso que Classic sin ser un muro, **Soft** siga siendo onboarding sin ser piloto automático, y **Brutal** quede como modo castigo. El config por defecto ahora coincide con Classic.
 
+## v0.3 — Minimal Sensory Polish
+
+Capa de feedback puramente visual. **No cambia física, presets, fairness ni dificultad**: la hitbox, el spawn justo (`maxGapShift` / `spawnGapDistance`), la telemetría y la lógica de score quedan intactos.
+
+- **Squash & stretch del flap**: al tapear, el personaje se estira horizontalmente y se aplasta verticalmente (~12%) durante 0.14 s. Solo escala de render; `characterRadius` y la hitbox real no cambian.
+- **Score pop**: el número de score hace un pop (CSS `scorePop`) cada vez que incrementa.
+- **Partículas al pasar obstáculo**: 8 chispas doradas de vida corta cerca del personaje.
+- **Partículas de muerte**: explosión de 18 partículas alrededor del personaje; no bloquea el retry.
+- **Tarjeta de muerte suavizada**: fade + scale corto (0.18 s) al aparecer el overlay.
+
+Las partículas viven en canvas, sin imágenes ni assets, avanzan con tiempo de frame (no con el paso de física) y se limpian al reiniciar el run.
+
 ## Presets
 
 | Parámetro | Soft | Classic | Brutal | Viral Candidate |

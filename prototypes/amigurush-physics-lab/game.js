@@ -13,6 +13,7 @@ const H = 844;
 const CHARACTER_X = 110; // X fija del personaje
 const FIXED_DT = 1 / 120; // paso de física fijo (independiente del framerate)
 const MAX_FRAME_TIME = 0.25; // clamp para evitar espiral de la muerte en pestañas inactivas
+const FLAP_SQUASH_TIME = 0.14; // s — duración del squash & stretch visual del flap
 
 // ---------- Configuración de física (mutable en vivo) ----------
 const config = {
@@ -102,6 +103,7 @@ const game = {
   death: null,             // telemetría de la última muerte
   flapQueued: false,
   bobPhase: 0,             // animación idle en READY
+  flapVisualTimer: 0,      // s restantes del squash & stretch (solo render)
 };
 
 // ---------- DOM ----------
@@ -249,6 +251,7 @@ function flap() {
   // El impulso REEMPLAZA la velocidad vertical (no se suma): esto cancela
   // la caída actual y hace que el tap se sienta responsivo, nunca torpe.
   game.vy = config.flapImpulse;
+  game.flapVisualTimer = FLAP_SQUASH_TIME;
 }
 
 canvas.addEventListener("pointerdown", (e) => {
@@ -283,6 +286,8 @@ function resetRun() {
   game.lastGapCenter = H / 2;
   game.score = 0;
   game.death = null;
+  game.flapVisualTimer = 0;
+  particles.length = 0;
   updateHud();
 }
 
@@ -322,7 +327,8 @@ function die(cause) {
   showDeathOverlay();
   updateHud();
 
-  // Feedback: flash + shake
+  // Feedback: partículas + flash + shake
+  spawnParticles(CHARACTER_X, game.y, 18, ["#ffb35c", "#ff5c6c", "#e8eaf2"], 260, 0.6);
   flashEl.classList.remove("active");
   void flashEl.offsetWidth; // reinicia la animación
   flashEl.classList.add("active");
@@ -373,6 +379,56 @@ function showDeathOverlay() {
   deathOverlay.classList.remove("hidden");
 }
 
+// ---------- Partículas (solo feedback visual: no tocan física ni gameplay) ----------
+const particles = [];
+
+function spawnParticles(x, y, count, colors, speed, life) {
+  for (let i = 0; i < count; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const s = speed * (0.35 + Math.random() * 0.65);
+    particles.push({
+      x, y,
+      vx: Math.cos(a) * s,
+      vy: Math.sin(a) * s,
+      life: 0,
+      maxLife: life * (0.6 + Math.random() * 0.4),
+      size: 1.5 + Math.random() * 2,
+      color: colors[(Math.random() * colors.length) | 0],
+    });
+  }
+}
+
+function updateParticles(dt) {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.life += dt;
+    if (p.life >= p.maxLife) {
+      particles.splice(i, 1);
+      continue;
+    }
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.vy += 600 * dt; // gravedad visual ligera, independiente de config.gravity
+  }
+}
+
+function drawParticles() {
+  for (const p of particles) {
+    ctx.globalAlpha = 1 - p.life / p.maxLife;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function scorePop() {
+  scoreLabel.classList.remove("pop");
+  void scoreLabel.offsetWidth; // reinicia la animación CSS
+  scoreLabel.classList.add("pop");
+}
+
 // ---------- Física (paso fijo, independiente del framerate) ----------
 function physicsStep(dt) {
   game.timeAlive += dt;
@@ -395,6 +451,8 @@ function physicsStep(dt) {
     if (!o.passed && o.x + config.obstacleWidth < CHARACTER_X) {
       o.passed = true;
       game.score++;
+      scorePop();
+      spawnParticles(CHARACTER_X + 14, game.y, 8, ["#ffd76a", "#ffb35c"], 140, 0.45);
       updateHud();
     }
   }
@@ -486,6 +544,7 @@ function render() {
   drawBackground();
   drawObstacles();
   drawCharacter();
+  drawParticles();
   if (config.debugMode) drawDebug();
 }
 
@@ -538,9 +597,16 @@ function drawCharacter() {
     ? Math.max(-0.45, Math.min(0.9, game.vy / 900))
     : 0;
 
+  // Squash & stretch sutil del flap: solo escala de render, la hitbox
+  // (characterRadius - hitboxPadding) no se ve afectada.
+  const squash = game.flapVisualTimer > 0 ? game.flapVisualTimer / FLAP_SQUASH_TIME : 0;
+  const scaleX = 1 + 0.12 * squash;
+  const scaleY = 1 - 0.12 * squash;
+
   ctx.save();
   ctx.translate(CHARACTER_X, y);
   ctx.rotate(tilt);
+  ctx.scale(scaleX, scaleY);
 
   // Cuerpo: círculo con "puntadas" para sugerir amigurumi sin arte final
   ctx.fillStyle = "#ffb35c";
@@ -659,6 +725,12 @@ function frame(now) {
     accumulator = 0;
     game.bobPhase += frameTime * 3;
   }
+
+  // Efectos puramente visuales: avanzan con tiempo de frame, no con el paso de física
+  if (game.flapVisualTimer > 0) {
+    game.flapVisualTimer = Math.max(0, game.flapVisualTimer - frameTime);
+  }
+  updateParticles(frameTime);
 
   render();
   updateDebugPanel();
