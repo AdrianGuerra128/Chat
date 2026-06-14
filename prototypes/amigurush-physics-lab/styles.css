@@ -339,6 +339,80 @@ canvas {
   border-color: var(--danger);
 }
 
+/* ---------- Prototype sandbox controls ---------- */
+
+.prototype-section {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--panel-border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prototype-section h3 {
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  color: var(--accent);
+}
+
+.prototype-note {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.prototype-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.prototype-field > span {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.prototype-field select {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 7px 8px;
+  font-size: 13px;
+}
+
+.prototype-radio-row {
+  display: flex;
+  gap: 14px;
+  color: var(--text);
+}
+
+.prototype-radio-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.prototype-radio-row input {
+  accent-color: var(--accent);
+}
+
+.prototype-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.prototype-toggle input {
+  accent-color: var(--accent);
+}
+
 @media (max-width: 800px) {
   .app {
     padding: 12px;

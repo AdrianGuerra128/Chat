@@ -69,6 +69,65 @@ const PRESETS = {
   },
 };
 
+// ---------- Sandbox: prototipo visual del obstáculo híbrido (no afecta física) ----------
+// Estado separado de `config`: cambiar `prototypeVisual` no toca hitbox, spawn,
+// presets ni fairness. Solo afecta el render de fondo y obstáculos.
+const prototypeVisual = {
+  world: "pradera",            // "pradera" | "carnaval" | "cuna"
+  deadZoneMode: "conservative", // "conservative" | "tight"
+  showDeadZone: false,
+};
+
+// Margen visual de zona muerta decorativa (en píxeles, medidos sobre la cara
+// interior del cuerpo). La decoración nunca entra en esta franja; solo el
+// cuerpo recto. El valor "tight" estresa la lectura del gap.
+const DEAD_ZONES = {
+  conservative: 22,
+  tight: 12,
+};
+
+// Paleta procedural por mundo. Todo es Canvas 2D; ningún asset externo.
+const WORLDS = {
+  pradera: {
+    label: "Pradera Hilván",
+    bgTop: "#d6ecc8",
+    bgBottom: "#a8c995",
+    motePrimary: "rgba(255, 245, 200, 0.35)",
+    moteSecondary: "rgba(140, 95, 60, 0.18)",
+    bodyFill: "#caa07a",     // lana cálida media
+    bodyShade: "#a07a52",
+    bodyHighlight: "rgba(255, 240, 210, 0.18)",
+    stitchLine: "rgba(120, 80, 45, 0.45)",
+    needleColor: "#f1d9a7",  // remate aguja decorativa
+    needleTip: "#e8c47a",
+  },
+  carnaval: {
+    label: "Carnaval de Ovillos",
+    bgTop: "#f2b6c7",
+    bgBottom: "#e58aa0",
+    motePrimary: "rgba(255, 240, 200, 0.32)",
+    moteSecondary: "rgba(120, 60, 90, 0.18)",
+    bodyFill: "#5e4a6c",     // tono neutro/oscuro, no compite con saturación
+    bodyShade: "#3f3149",
+    bodyHighlight: "rgba(255, 220, 240, 0.14)",
+    stitchLine: "rgba(255, 220, 240, 0.30)",
+    yarnCoatA: "#8a6fa3",
+    yarnCoatB: "#b48fcf",
+  },
+  cuna: {
+    label: "Cuna Estelar",
+    bgTop: "#1b1f3a",
+    bgBottom: "#0d1124",
+    motePrimary: "rgba(220, 230, 255, 0.45)",
+    moteSecondary: "rgba(140, 160, 220, 0.18)",
+    bodyFill: "#1a1f3e",      // fieltro navy: contraste por luz, no por color
+    bodyShade: "#0e1228",
+    bodyHighlight: "rgba(180, 200, 255, 0.10)",
+    luminousEdge: "#9fc8ff",
+    starColor: "#f5e9b8",
+  },
+};
+
 // Definición de sliders del panel: [clave, min, max, step]
 const SLIDER_DEFS = [
   ["gravity",           800, 4000, 50],
@@ -555,15 +614,16 @@ function render() {
 }
 
 function drawBackground() {
+  const world = WORLDS[prototypeVisual.world];
   const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, "#221d36");
-  grad.addColorStop(1, "#171225");
+  grad.addColorStop(0, world.bgTop);
+  grad.addColorStop(1, world.bgBottom);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  // Capa lejana de parallax: ovillos/colinas suaves en la base (tenues)
+  // Capa lejana de parallax: colinas/ovillos lejanos (tenues)
   const far = bgScroll * 0.15;
-  ctx.fillStyle = "rgba(108, 96, 158, 0.18)";
+  ctx.fillStyle = world.moteSecondary;
   for (let i = 0; i < 6; i++) {
     const x = wrapMod(i * 165 + 40 - far, W + 340) - 170;
     const r = 70 + (i % 3) * 32;
@@ -572,9 +632,9 @@ function drawBackground() {
     ctx.fill();
   }
 
-  // Capa cercana de parallax: motas de lana flotantes (alpha bajo, no distraen)
+  // Capa cercana de parallax: motas flotantes
   const near = bgScroll * 0.35;
-  ctx.fillStyle = "rgba(255, 211, 150, 0.12)";
+  ctx.fillStyle = world.motePrimary;
   for (let i = 0; i < 14; i++) {
     const x = wrapMod(i * 97 + 31 - near, W + 60) - 30;
     const y = ((i * 167 + 80) % (H - 160)) + 60;
@@ -593,19 +653,187 @@ function drawBackground() {
 }
 
 function drawObstacles() {
+  const world = prototypeVisual.world;
   for (const o of game.obstacles) {
     const gapTop = o.gapCenter - config.gapSize / 2;
     const gapBottom = o.gapCenter + config.gapSize / 2;
     const w = config.obstacleWidth;
 
-    drawYarnColumn(o.x, -8, w, gapTop + 8);
-    drawYarnColumn(o.x, gapBottom, w, H - gapBottom + 8);
+    // Columna superior (cara que mira al gap = inferior). "top" = parte superior.
+    drawHybridObstacleColumn(o.x, -8, w, gapTop + 8, "top", world);
+    // Columna inferior (cara que mira al gap = superior). "bottom" = parte inferior.
+    drawHybridObstacleColumn(o.x, gapBottom, w, H - gapBottom + 8, "bottom", world);
 
-    // Borde del gap con puntadas tipo crochet (legibilidad del hueco intacta:
-    // las puntadas se centran en la línea del borde, solo decoración)
+    // Borde del gap: trim limpio (no invade el espacio navegable).
     drawStitchEdge(o.x, gapTop, w, false);
     drawStitchEdge(o.x, gapBottom, w, true);
+
+    // Marcador de zona muerta decorativa (QA visual, no afecta colisión).
+    if (prototypeVisual.showDeadZone) {
+      drawDeadZoneMarker(o.x, gapTop, gapBottom, w);
+    }
   }
+}
+
+// Render híbrido honesto por mundo. El cuerpo es siempre el rectángulo
+// `[x, y, w, h]` (mismo que la hitbox actual). La decoración temática vive
+// fuera de la zona muerta del gap y nunca sobre la cara interna.
+//   `part` = "top" (la cara interna está en y + h) | "bottom" (cara interna en y).
+//   `world` = clave en WORLDS.
+function drawHybridObstacleColumn(x, y, w, h, part, world) {
+  if (h <= 0) return;
+  const p = WORLDS[world];
+  // Cara interna del cuerpo (la que mira al gap):
+  //   - top: borde inferior  = y + h
+  //   - bottom: borde superior = y
+  const innerEdge = part === "top" ? y + h : y;
+  const margin = DEAD_ZONES[prototypeVisual.deadZoneMode];
+
+  // Cuerpo recto (la silueta del rectángulo es la hitbox).
+  ctx.fillStyle = p.bodyFill;
+  roundRect(x, y, w, h, 8);
+
+  // Sombra interior lateral, refuerza volumen sin invadir el gap.
+  ctx.fillStyle = p.bodyShade;
+  roundRect(x, y, 6, h, 8);
+  roundRect(x + w - 6, y, 6, h, 8);
+
+  // Textura del cuerpo: variación procedural por mundo, vive lejos del gap.
+  if (world === "pradera") {
+    drawPraderaBody(x, y, w, h, part, p, margin, innerEdge);
+  } else if (world === "carnaval") {
+    drawCarnavalBody(x, y, w, h, part, p, margin, innerEdge);
+  } else if (world === "cuna") {
+    drawCunaBody(x, y, w, h, part, p, margin, innerEdge);
+  }
+
+  // Borde lateral tipo hilo (cara exterior, no invade gap).
+  ctx.strokeStyle = p.bodyHighlight;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x + 1.5, y + 4);
+  ctx.lineTo(x + 1.5, y + h - 4);
+  ctx.moveTo(x + w - 1.5, y + 4);
+  ctx.lineTo(x + w - 1.5, y + h - 4);
+  ctx.stroke();
+}
+
+// Pradera: textura de lana procedural + remate de aguja en el EXTREMO EXTERIOR.
+// Para `top`, el extremo exterior es y (arriba). Para `bottom`, es y + h (abajo).
+function drawPraderaBody(x, y, w, h, part, p, margin, innerEdge) {
+  // Filas de lana horizontales, detenidas antes de la zona muerta.
+  ctx.strokeStyle = p.stitchLine;
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  const innerLimit = part === "top" ? innerEdge - margin : innerEdge + margin;
+  const yStart = part === "top" ? y + 6 : innerLimit + 4;
+  const yEnd   = part === "top" ? innerLimit - 4 : y + h - 4;
+  for (let yy = yStart; yy < yEnd; yy += 10) {
+    ctx.moveTo(x + 4, yy);
+    ctx.quadraticCurveTo(x + w / 2, yy + 2.5, x + w - 4, yy);
+  }
+  ctx.stroke();
+
+  // Remate de aguja decorativa en el extremo exterior (lejos del gap).
+  const tipY = part === "top" ? y - 2 : y + h + 2;
+  const baseY = part === "top" ? y + 10 : y + h - 10;
+  const cx = x + w / 2;
+  ctx.fillStyle = p.needleColor;
+  ctx.beginPath();
+  ctx.moveTo(cx - 7, baseY);
+  ctx.lineTo(cx + 7, baseY);
+  ctx.lineTo(cx, tipY);
+  ctx.closePath();
+  ctx.fill();
+  // Bolita textil en la base de la aguja (refuerza identidad sin tocar gap).
+  ctx.fillStyle = p.needleTip;
+  ctx.beginPath();
+  ctx.arc(cx, baseY, 5, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Carnaval: forro procedural de ovillo en la cara exterior. El cuerpo
+// mantiene un tono neutro contra el fondo saturado; la decoración no
+// invade la zona muerta del gap.
+function drawCarnavalBody(x, y, w, h, part, p, margin, innerEdge) {
+  const innerLimit = part === "top" ? innerEdge - margin : innerEdge + margin;
+  const yStart = part === "top" ? y + 6 : innerLimit + 6;
+  const yEnd   = part === "top" ? innerLimit - 6 : y + h - 6;
+  const radius = 7;
+  const stepX = 14;
+  const stepY = 14;
+  for (let yy = yStart; yy < yEnd; yy += stepY) {
+    const offset = ((yy / stepY) | 0) % 2 === 0 ? 0 : stepX / 2;
+    for (let xx = x + 8 + offset; xx < x + w - 8; xx += stepX) {
+      const useA = ((xx + yy) | 0) % 2 === 0;
+      ctx.fillStyle = useA ? p.yarnCoatA : p.yarnCoatB;
+      ctx.beginPath();
+      ctx.arc(xx, yy, radius, 0, Math.PI * 2);
+      ctx.fill();
+      // Espiral interna del ovillo
+      ctx.strokeStyle = "rgba(20, 10, 30, 0.25)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(xx, yy, radius - 2, 0, Math.PI * 1.4);
+      ctx.stroke();
+    }
+  }
+}
+
+// Cuna Estelar: cuerpo oscuro fieltro + borde luminoso del gap por contraste
+// de luz. Estrellas decorativas solo en el extremo exterior, fuera del gap.
+function drawCunaBody(x, y, w, h, part, p, margin, innerEdge) {
+  // Borde luminoso de la cara interior (delimitador por luz, no por color).
+  ctx.fillStyle = p.luminousEdge;
+  if (part === "top") {
+    ctx.fillRect(x + 3, innerEdge - 3, w - 6, 2);
+  } else {
+    ctx.fillRect(x + 3, innerEdge + 1, w - 6, 2);
+  }
+  // Halo suave del borde luminoso (no invade el gap).
+  ctx.fillStyle = "rgba(159, 200, 255, 0.18)";
+  if (part === "top") {
+    ctx.fillRect(x + 3, innerEdge - 7, w - 6, 4);
+  } else {
+    ctx.fillRect(x + 3, innerEdge + 3, w - 6, 4);
+  }
+
+  // Estrellas decorativas en el extremo EXTERIOR (lejos del gap).
+  ctx.fillStyle = p.starColor;
+  const cx = x + w / 2;
+  const exteriorY = part === "top" ? y + 14 : y + h - 14;
+  drawSimpleStar(cx - 14, exteriorY, 3.5);
+  drawSimpleStar(cx + 12, exteriorY + 6, 2.5);
+  drawSimpleStar(cx, exteriorY + 14, 3);
+}
+
+function drawSimpleStar(cx, cy, r) {
+  ctx.beginPath();
+  for (let i = 0; i < 5; i++) {
+    const a = -Math.PI / 2 + i * (Math.PI * 2 / 5);
+    const x = cx + Math.cos(a) * r;
+    const y = cy + Math.sin(a) * r;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    const a2 = a + Math.PI / 5;
+    ctx.lineTo(cx + Math.cos(a2) * r * 0.45, cy + Math.sin(a2) * r * 0.45);
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+// Marcador visual de zona muerta decorativa: dos franjas translúcidas
+// que muestran el margen libre alrededor del gap. Solo QA, no afecta nada.
+function drawDeadZoneMarker(x, gapTop, gapBottom, w) {
+  const margin = DEAD_ZONES[prototypeVisual.deadZoneMode];
+  ctx.fillStyle = "rgba(126, 231, 135, 0.22)";
+  ctx.fillRect(x, gapTop - margin, w, margin);
+  ctx.fillRect(x, gapBottom, w, margin);
+  ctx.strokeStyle = "rgba(126, 231, 135, 0.7)";
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.strokeRect(x + 0.5, gapTop - margin + 0.5, w - 1, margin - 1);
+  ctx.strokeRect(x + 0.5, gapBottom + 0.5, w - 1, margin - 1);
+  ctx.setLineDash([]);
 }
 
 // Columna de obstáculo con textura de tejido procedural (solo visual:
@@ -878,9 +1106,36 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 
+// ---------- Sandbox controls (prototipo híbrido visual) ----------
+// Estos controles modifican únicamente `prototypeVisual`. Nunca tocan
+// `config`, `PRESETS`, `SLIDER_DEFS` ni la física.
+function buildPrototypeControls() {
+  const worldSel = document.getElementById("prototypeWorld");
+  if (worldSel) {
+    worldSel.value = prototypeVisual.world;
+    worldSel.addEventListener("change", () => {
+      prototypeVisual.world = worldSel.value;
+    });
+  }
+  document.querySelectorAll('input[name="prototypeDeadZone"]').forEach((el) => {
+    el.checked = el.value === prototypeVisual.deadZoneMode;
+    el.addEventListener("change", () => {
+      if (el.checked) prototypeVisual.deadZoneMode = el.value;
+    });
+  });
+  const showDz = document.getElementById("prototypeShowDeadZone");
+  if (showDz) {
+    showDz.checked = prototypeVisual.showDeadZone;
+    showDz.addEventListener("change", () => {
+      prototypeVisual.showDeadZone = showDz.checked;
+    });
+  }
+}
+
 // ---------- Init ----------
 loadBest();
 buildControls();
+buildPrototypeControls();
 applyPreset("classic");
 resetRun();
 updateHud();

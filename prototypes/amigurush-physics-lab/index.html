@@ -66,6 +66,33 @@
       </div>
 
       <button class="reset-btn" id="resetBest">Reset Best Score</button>
+
+      <div class="prototype-section">
+        <h3>Hybrid Obstacle Sandbox</h3>
+        <p class="prototype-note">Solo visual. No afecta hitbox, física, presets ni spawn.</p>
+
+        <label class="prototype-field">
+          <span>World</span>
+          <select id="prototypeWorld">
+            <option value="pradera">Pradera Hilván</option>
+            <option value="carnaval">Carnaval de Ovillos</option>
+            <option value="cuna">Cuna Estelar (opcional)</option>
+          </select>
+        </label>
+
+        <div class="prototype-field">
+          <span>Dead zone</span>
+          <div class="prototype-radio-row">
+            <label><input type="radio" name="prototypeDeadZone" value="conservative" /> Conservadora</label>
+            <label><input type="radio" name="prototypeDeadZone" value="tight" /> Ajustada</label>
+          </div>
+        </div>
+
+        <label class="prototype-toggle">
+          <input type="checkbox" id="prototypeShowDeadZone" />
+          Mostrar zona muerta decorativa
+        </label>
+      </div>
     </div>
   </div>
 
