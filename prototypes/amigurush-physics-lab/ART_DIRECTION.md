@@ -2,6 +2,8 @@
 
 > Documento de gobernanza visual. Congela la identidad alcanzada en v0.4.1 y define reglas para cualquier pase visual futuro. **No es un documento de implementación**: no cambia física, presets, fairness, spawn, score, hitbox ni telemetría.
 
+> Nota: `ART_DIRECTION.md` sigue siendo el contrato visual canónico del Physics Lab. `UNIVERSE_BIBLE.md` complementa este documento con universo, cast, mundos y capa competitiva/social. Las decisiones nuevas del Universe Bible no reemplazan este Art Direction Lock hasta ser validadas y promovidas explícitamente.
+
 ## 1. North Star Visual
 
 AmiguRush se ve y se siente como un **mundo de amigurumi tejido a mano, de noche, jugado con hilos cálidos sobre un fondo frío**. La identidad central es el contraste entre el calor del personaje (naranja/crema, vivo, expresivo) y la frialdad envolvente del mundo (violetas oscuros, azules profundos, obstáculos tejidos en tonos fríos-medios). El jugador debe sentir que está pilotando un muñeco de lana hecho a mano a través de un túnel de estambre infinito — táctil, suave, pero con tensión arcade real.
