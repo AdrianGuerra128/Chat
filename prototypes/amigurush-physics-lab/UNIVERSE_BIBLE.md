@@ -1,99 +1,346 @@
-# AmiguRush — Universe Bible v0.1
+# AmiguRush Universe Bible v0.1
 
-> Documento de producto / IP. Complementa a `ART_DIRECTION.md` (contrato visual) definiendo el universo narrativo, el cast, los mundos, la fórmula de producto, el loop viral y el pilar competitivo/social de AmiguRush. **No es un documento de implementación**: no crea prototipos, no cambia física, presets, fairness, spawn, score, hitbox, collision ni telemetría. Las decisiones aquí descritas son dirección de producto a futuro y requieren validación y promoción explícita antes de tocar código.
+> Documento canónico de universo, cast y dirección competitiva de AmiguRush.
+> Estado: borrador para revisión. No es implementación. No reemplaza aún `ART_DIRECTION.md` (ver §15).
 
-## 1. Premisa del Universo
+---
 
-AmiguRush ocurre en **El Ovillo** (*The Skein*): un universo nocturno e infinito hecho enteramente de lana, hilo y puntadas — sin bordes duros, sin metal, sin vidrio. Todo lo que existe fue tejido por alguien, en algún momento, con cariño y un poco de prisa. Los habitantes de El Ovillo son **amigurumis vivos**: pequeñas criaturas de crochet con personalidad propia, que se mueven por túneles de estambre tendidos entre ovillos gigantes que flotan como planetas.
+## 1. Resumen ejecutivo
 
-La premisa central del juego: cada personaje "vuela" (en realidad, **rebota e impulsa**) a través de estos túneles tejidos, esquivando columnas de lana tensada — los obstáculos —, en una carrera personal contra su propio mejor tiempo y, eventualmente, contra el resto del mundo.
+AmiguRush es un juego móvil casual de **tap-to-survive** ambientado en un mundo tejido a mano (amigurumi / crochet). Su esqueleto jugable es Flappy Bird, su sensación es la precisión de reflejo de Geometry Dash, y su loop es el de un endless runner de partidas cortas y *score chasing*.
 
-**Tono**: cálido, juguete, hecho-a-mano, ligeramente travieso. Nunca oscuro, nunca violento, nunca corporativo. La dificultad es real (el juego puede ser brutal), pero la *ambientación* siempre es acogedora — morir se siente como "se deshizo la puntada", no como una catástrofe.
+No es "solo cute". La estética pastel handmade es el envoltorio emocional, pero el núcleo es un juego de precisión exigente y, sobre todo, **competitivo y social**: está pensado para una comunidad tipo Twitch/creator (esfera Staryuuki) donde el récord es público, presumible y clippeable.
 
-## 2. Cast — Personaje Principal
+El componente competitivo/social es **central, no secundario**. La pantalla de récords no es un menú de consulta: es el campo de batalla donde vive la razón para volver. Por eso esta Bible eleva el leaderboard, los rankings semanales/de comunidad y los retos de stream a pilar de producto.
 
-### Lanita (nombre de trabajo)
+Decisiones que toma este documento:
+- **Universo:** un sistema de 6 mundos tejidos que forman un solo arco emocional y de dificultad.
+- **Cast:** un único héroe de marca (Pompón) rodeado de un roster con roles que no se solapan.
+- **Progresión:** los mundos escalan como una montaña rusa controlada (no "cada vez más fuerte" a secas), y cada mundo es un paquete de eventos, skins y coleccionables.
 
-- **Quién es**: el amigurumi naranja que ya existe en el Physics Lab (`#ffb35c` / `#d98c3f`). Es el protagonista y, narrativamente, el "tejido más reciente" de El Ovillo — todavía tiene una hebra suelta (su cola animada) porque nadie terminó de rematarlo.
-- **Personalidad**: curioso, optimista, un poco torpe, persistente. No le teme a estrellarse — cada intento es información, no fracaso.
-- **Rol de gameplay**: es el avatar por defecto y la cara de marca. Su silueta, paleta y expresión son **intocables** (ya protegidas por `ART_DIRECTION.md` §3-4).
-- **Rol narrativo**: el "recién tejido" que explora El Ovillo por primera vez — esto justifica narrativamente que el jugador también esté aprendiendo las reglas del mundo.
+---
 
-## 3. Cast — Elenco Futuro (no implementado)
+## 2. Fórmula base del producto
 
-Estos personajes son **dirección de producto a futuro**, no contenido actual. Ninguno existe en el Physics Lab hoy. Se documentan para que cualquier expansión de cast tenga un marco consistente, no para autorizar su creación.
+AmiguRush es la intersección deliberada de cinco fuerzas. Ninguna debe ahogar a las otras.
 
-| Personaje (working name) | Rol | Nota |
-|---|---|---|
-| **Hilván** | Rival/ghost runner | Un amigurumi gris-azulado, más "prolijo" que Lanita — representa el fantasma del mejor corredor de un amigo o del propio jugador (ghost replay). |
-| **Doña Aguja** | NPC narrador / tutorial | Un personaje tipo "tejedora mayor" que aparece solo en pantallas de menú/tutorial, nunca en gameplay activo — voz de la "regla del mundo". |
-| **Nudos** (criaturas menores) | Obstáculos con personalidad | Versión futura de los obstáculos con micro-expresiones (ver §9, riesgo de legibilidad). |
+- **Flappy Bird — esqueleto jugable.** Input de un tap, gravedad, obstáculos con gaps, lectura inmediata, muerte rápida, retry instantáneo.
+- **Geometry Dash — precisión / tensión / ritmo.** Sensación de carrera de reflejos: timing ajustado, "fallé por poco, otra vez", curva de tensión real.
+- **Doodle Jump / endless runners — loop.** Partidas cortas, repetición rápida, score que sube, dificultad creciente, récord personal como ancla.
+- **Amigurumi / crochet — identidad visual y emocional.** Cute, físico, táctil, blandito, cozy, coleccionable, compartible, memorable.
+- **Staryuuki / Twitch / community — motor social y viral.** Rankings, récords, retos semanales, nombres visibles, orgullo comunitario, clips, "yo supero ese score".
 
-Regla de cast: **cualquier personaje nuevo sigue la misma paleta y lenguaje de formas de `ART_DIRECTION.md` §3 y §7**, y ninguno puede competir visualmente con Lanita dentro del gameplay activo (principio §1 del Art Direction Lock: "el personaje es el sol del frame").
+Regla de oro de la fórmula: **el alma es cozy; el núcleo es implacable.** El crochet envuelve todo, pero nunca decide quién vive o muere.
 
-## 4. Mundos de El Ovillo
+---
 
-El Ovillo es un único espacio narrativo, pero se divide en **biomas** — variaciones temáticas del mismo lenguaje visual (lana + noche + violetas/naranjas), nunca escenarios completamente distintos.
+## 3. North Star del universo
 
-### Bioma actual: **El Pasillo Nocturno** (Night Skein)
-El bioma ya implementado — fondo violeta-navy con parallax de ovillos y motas, columnas tejidas. Es el "nivel cero", el lugar donde todo amigurumi nuevo aprende a volar. **Es la base de todo lo demás y no se reemplaza.**
+Una criatura de lana corre por un mundo tejido a mano: la esquivas por un pelo, mueres al instante y vuelves a intentarlo — persiguiendo un récord que toda tu comunidad puede ver. El mundo te abraza; el score te reta. La piel es handmade y coleccionable; el corazón es preciso y competitivo.
 
-### Biomas futuros (solo dirección, no roadmap activo)
+---
 
-| Bioma | Variación | Restricción |
-|---|---|---|
-| **El Costurero** | Tonos más cálidos (ámbar/rojo tenue), obstáculos con forma de carretes | Misma paleta base; solo desplaza el balance cálido/frío dentro de los rangos ya definidos |
-| **El Telar Helado** | Tonos más fríos (azul/cian tenue) | Debe mantener a Lanita como elemento más cálido del frame incluso aquí |
-| **El Ovillo Profundo** | Variante "endless/brutal" — más oscuro, parallax más lento | Reutiliza preset Brutal; no es un bioma nuevo de arte, es un *filtro* sobre el bioma actual |
+## 4. Principios de diseño del universo (innegociables)
 
-Cada bioma futuro es, en términos de implementación, **una variación de paleta de fondo/obstáculos sobre el mismo motor y la misma silueta de personaje** — nunca un reskin completo ni una mecánica nueva. Esto preserva la regla "Canvas 2D puro, sin assets" y evita que el roadmap de mundos se convierta en una excusa para reescribir el juego.
+- **Cute pero competitivo.** Lo adorable no excusa lo blando: el juego pica y se presume.
+- **Cozy por fuera, preciso por dentro.** Calidez antes/después de la partida; precisión durante.
+- **Legibilidad primero.** Si no se lee a tamaño móvil y en movimiento, no entra.
+- **Score chasing visible.** El número es protagonista, no un dato escondido.
+- **Comunidad como motor.** El nombre y el récord son públicos; competir es el combustible.
+- **Estética handmade premium.** Saturación contenida, materiales textiles, acabado consistente.
+- **Nada de decoración que mate gameplay.** La forma visible es la hitbox; el adorno jamás invade la zona de colisión.
 
-## 5. Fórmula de Producto
+---
 
-AmiguRush se construye en **tres capas**, y el Physics Lab de hoy es, deliberadamente, solo la capa 1.
+## 5. Mundos / biomas
 
-1. **Capa Core (existe hoy)**: el loop arcade — flap, esquiva, muere, reintenta. Vive en `prototypes/amigurush-physics-lab/`. Esta capa es la que `ART_DIRECTION.md` protege visualmente y la que toda la física/fairness ya calibrada sostiene.
-2. **Capa de Progresión (futuro)**: best score persistente (ya existe vía `localStorage`), y eventualmente desbloqueos cosméticos *dentro de la paleta bloqueada* (ej. variantes de color de la hebra de Lanita, no personajes nuevos) y biomas (§4). Sin tienda, sin pagos — esto es producto, no monetización.
-3. **Capa Social/Competitiva (futuro)**: ver §7.
+Seis mundos tejidos. Cada uno con material, paleta y arquetipo de obstáculo coherentes con la regla de hitbox honesta (cuerpo recto honesto, decoración fuera del gap).
 
-**La fórmula no cambia**: sesiones de 10-60 segundos, fracaso instantáneo y justo (`maxGapShift` ya lo garantiza), reintento sin friction. Cualquier capa nueva debe **preservar la duración de sesión y el tiempo-a-reintento actuales** — son el corazón del producto, no un detalle.
+### 01 · Pradera Hilván
+- **Rol en el arco:** onboarding. Bienvenida y tutorial.
+- **Emoción:** calma, ternura, seguridad.
+- **Dificultad / intensidad:** muy baja (●○○○○).
+- **Paleta:** verde suave, crema, cielo pastel, durazno.
+- **Materiales:** lana basta, rocío de hilo.
+- **Fondos:** amanecer de lana, colinas tejidas suaves, nubes de algodón.
+- **Obstáculos:** agujas de tejer bajas y muy espaciadas.
+- **Decoración:** florecitas de fieltro, briznas de lana.
+- **Eventos / skins:** skins base, tutorial cosmético, eventos de bienvenida.
+- **Riesgo visual principal:** verse demasiado vacío o "de relleno" por ser el más simple.
 
-## 6. Loop Viral
+### 02 · Bosque de Botones
+- **Rol en el arco:** dominio temprano. El jugador afina el control.
+- **Emoción:** curiosidad, exploración.
+- **Dificultad / intensidad:** baja-media (●●○○○).
+- **Paleta:** verde azulado, marrón madera, mostaza, crema.
+- **Materiales:** fieltro y botones de madera.
+- **Fondos:** espesura tejida, troncos de hilo, dosel de hojas de fieltro.
+- **Obstáculos:** ramas tejidas con botones colgantes (botón decorativo fuera del gap).
+- **Decoración:** botones, hojas de fieltro, setas de lana al fondo.
+- **Eventos / skins:** skins "boscosas", coleccionables de botones.
+- **Riesgo visual principal:** paleta apagada que pierda el atractivo pastel si se oscurece de más.
 
-El loop viral de AmiguRush se apoya en tres mecánicas, todas derivadas de lo que **ya existe** en el Physics Lab:
+### 03 · Carnaval de Ovillos
+- **Rol en el arco:** pico viral. El mundo bandera para clips.
+- **Emoción:** euforia, dopamina, fiesta.
+- **Dificultad / intensidad:** media-alta (●●●○○).
+- **Paleta:** rosa, amarillo, turquesa, lavanda (saturación máxima del arco).
+- **Materiales:** ovillos satinados, papel crepé, banderines de hilo.
+- **Fondos:** carpa de carnaval tejida, norias de ovillo en parallax, luces de bombilla-botón.
+- **Obstáculos:** torres de ovillos apiladas (cuerpo recto) con cintas rítmicas que marcan el compás; giran y brillan, nunca invaden el gap.
+- **Decoración:** confeti de lana, banderines, estrellas.
+- **Eventos / skins:** las skins de evento más vistosas; eventos de comunidad/stream.
+- **Riesgo visual principal:** sobrecarga decorativa que tape la lectura del gameplay.
 
-1. **El veredicto de fairness como gancho de compartir**: cada muerte ya genera un mini-reporte (`Tiempo vivo`, `Score`, `Gap shift`, `Fairness: Justa/Margen mínimo/Shift extremo`). Este reporte es, narrativamente, "tu certificado de qué tan cerca estuviste" — el formato ideal para un screenshot de muerte que se comparte diciendo "miren qué tan injusto/justo fue esto".
-2. **"Casi lo logré"**: la fairness garantizada por `maxGapShift` significa que las muertes se sienten evitables, no aleatorias — esto es lo que genera el reflejo de "una más" y el impulso de mostrarle a alguien "mira, casi pasaba".
-3. **Ghost/ritmo personal**: el "Last score" ya visible en el HUD es la semilla de un loop de "vencer a mi yo de hace 30 segundos" — la base para un futuro ghost runner (Hilván, §3) sin necesitar backend.
+### 04 · Río de Cintas
+- **Rol en el arco:** variedad dinámica. Rompe el ritmo con movimiento.
+- **Emoción:** fluidez, hipnosis suave.
+- **Dificultad / intensidad:** media-alta (●●●○○).
+- **Paleta:** azul, aqua, menta, crema.
+- **Materiales:** cintas de raso, agua de hilo.
+- **Fondos:** corriente de raso, riberas de lana, cascadas de cinta.
+- **Obstáculos:** cintas onduladas y corrientes (bordes honestos, movimiento lateral).
+- **Decoración:** burbujas de hilo, nenúfares de fieltro.
+- **Eventos / skins:** skins acuáticas, coleccionables de cinta.
+- **Riesgo visual principal:** que el movimiento de las cintas confunda la lectura de la hitbox.
 
-**Regla del loop viral**: nada de esto requiere servidores, cuentas ni compartir activo de datos. Todo el gancho viral vive en lo que el jugador *ve y puede capturar localmente* (overlay de muerte, score, fairness). Cualquier feature viral futura debe poder explicarse como "una captura de pantalla del estado actual del juego es suficiente para que tenga sentido".
+### 05 · Castillo Patchwork
+- **Rol en el arco:** prestigio. Desafío serio.
+- **Emoción:** reto, solemnidad, orgullo.
+- **Dificultad / intensidad:** alta (●●●●○).
+- **Paleta:** morado, oro, vino, gris piedra.
+- **Materiales:** patchwork acolchado, hilo metálico.
+- **Fondos:** murallas acolchadas, estandartes de retazos, torres de quilt.
+- **Obstáculos:** agujas de hierro tejido y almenas patchwork.
+- **Decoración:** escudos de retazos, antorchas de hilo dorado.
+- **Eventos / skins:** skins "reales", marcos de prestigio para leaderboard.
+- **Riesgo visual principal:** que el oro/metal rompa el código cozy y se sienta frío.
 
-## 7. Pilar Competitivo / Social
+### 06 · Cuna Estelar
+- **Rol en el arco:** endgame / premium. Cierre de prestigio.
+- **Emoción:** ensueño tenso, calma vibrante, "un último intento".
+- **Dificultad / intensidad:** máxima (●●●●●).
+- **Paleta:** navy profundo, lavanda, dorado fieltro, rosa polvo.
+- **Materiales:** fieltro afelpado, estrellas bordadas, hilo fosforescente.
+- **Fondos:** cielo navy con constelaciones de fieltro, luciérnagas de hilo, móvil de cuna girando lento.
+- **Obstáculos:** estrellas de fieltro y "agujas de luna" que brillan tenue (lectura por contraste de luz).
+- **Decoración:** lunas de lana, polvo estelar bordado.
+- **Eventos / skins:** las skins más raras; eventos nocturnos de Staryuuki.
+- **Riesgo visual principal:** bajo contraste sobre fondo oscuro que dañe la legibilidad del obstáculo.
 
-El pilar social de AmiguRush es **asíncrono y local-first**, consistente con "sin tienda, login, ranking ni backend" de `README.md` §Alcance.
+---
 
-- **Hoy**: `best` y `last` score en `localStorage` — la competencia es contra uno mismo. Esto ya es, sin saberlo, la primera capa del pilar social: "¿superaste tu mejor marca?"
-- **Próximo nivel conceptual (no implementado)**: un "desafío" es simplemente una captura de pantalla de la pantalla de muerte (score + fairness + preset) compartida fuera del juego — el receptor abre el juego, juega el mismo preset, y trata de superar ese número. **Cero infraestructura**: el desafío vive en la imagen, no en una cuenta.
-- **Eventual (años, no meses)**: si AmiguRush justifica backend algún día, el primer feature social real sería un leaderboard por preset (Classic/Viral/Soft/Brutal son, de hecho, "modos de competencia" ya nombrados y balanceados) — pero esto está explícitamente **fuera de cualquier roadmap visual o de Physics Lab actual**.
+## 6. Arco emocional y de dificultad
 
-**Pilar competitivo interno**: los cuatro presets ya funcionan como una escalera de dificultad reconocible ("¿ya pasaste de Soft a Classic? ¿Ya sobreviviste en Brutal?") — esto es, en sí mismo, progresión social informal sin necesitar un sistema nuevo.
+Los mundos entrelazan tres curvas para evitar la fatiga del "cada vez más difícil" plano:
+- **Dificultad:** sube de forma monótona de 1 a 6.
+- **Saturación:** sube hasta el Carnaval (pico) y se enfría hacia el Río y la noche.
+- **Energía emocional:** calma → euforia → calma tensa.
 
-## 8. Relación con ART_DIRECTION.md y el Physics Lab
+Lectura del arco:
+1. **Onboarding — Pradera Hilván.** Calma; aprender el tap sin castigo.
+2. **Dominio temprano — Bosque de Botones.** Afinar control; primera variedad.
+3. **Pico viral — Carnaval de Ovillos.** Máxima energía y saturación; el mundo de clips.
+4. **Variedad dinámica — Río de Cintas.** Cambio de ritmo con movimiento; enfría la saturación.
+5. **Prestigio — Castillo Patchwork.** Desafío serio; estatus.
+6. **Endgame / premium — Cuna Estelar.** Dificultad máxima, tono en calma; el fondo oscuro hace que el score brille.
 
-- `ART_DIRECTION.md` sigue siendo el **contrato visual canónico**. Este documento no lo modifica, no lo reemplaza y no introduce excepciones a su paleta, principios o reglas de Do/Don't.
-- Ninguna idea de este documento (cast futuro, biomas, capas de progresión, pilar social) está aprobada para implementación. Son **dirección**, no **roadmap activo**.
-- El roadmap activo sigue siendo el de `ART_DIRECTION.md` §10 (v0.5 → v0.5.1 → v0.6). Este Universe Bible no agrega, adelanta ni reordena ese roadmap.
-- Cualquier futuro pase que quiera tomar algo de aquí (un bioma, un personaje, una mecánica social) debe primero pasar por un **Art Direction Lock incremental** que confirme que no rompe §1-§9 de `ART_DIRECTION.md`.
+Regla: los mundos nuevos respetan la curva (se insertan donde encajan en el arco), nunca al azar. Cada mundo es además un paquete de eventos, skins y coleccionables.
 
-## 9. Riesgos y Límites
+---
 
-- **Riesgo de "scope creep narrativo"**: el mayor peligro de un documento de IP es que invite a justificar features porque "encajan en el universo". La regla es la inversa: el universo se ajusta para justificar lo que el gameplay y el arte ya soportan, no al revés.
-- **Cast futuro y legibilidad**: cualquier personaje nuevo en pantalla durante gameplay activo (rivales, obstáculos con cara) corre el riesgo de competir visualmente con Lanita o con el gap — violaría §1 y §4 de `ART_DIRECTION.md`. Por eso "Nudos" (obstáculos con personalidad) está marcado explícitamente como riesgo, no como plan.
-- **Biomas y identidad**: si un bioma futuro se siente "como un juego distinto" en lugar de "el mismo juego en otra parte de El Ovillo", se rompe la promesa de §4. La prueba de aceptación de cualquier bioma: un jugador debe reconocer instantáneamente que es AmiguRush.
-- **Pilar social sin backend**: es una fortaleza (cero infraestructura, cero costo, cero superficie de privacidad) pero limita qué tan "viral" puede llegar a ser sin inversión futura. Esto es una decisión consciente, no una limitación temporal a resolver con urgencia.
+## 7. Cast principal
 
-## 10. Recomendación Final
+Roster jerarquizado por rol, no por gusto. Si dos personajes cumplen el mismo rol, uno sobra.
 
-Este Universe Bible existe para que, cuando llegue el momento de pensar en "qué sigue después del Physics Lab", exista un marco narrativo y de producto consistente con todo lo ya construido — en lugar de improvisar una historia que no encaje con la paleta, el personaje o el loop ya calibrados.
+### Pompón — héroe principal
+- **Rol:** protagonista y ancla de marca. Rostro del ícono, splash y marketing. Uno solo.
+- **Personalidad:** valiente pero tierno; optimista, con un punto travieso.
+- **Silueta:** conejo crema, orejas + auriculares rosas + estrella en la frente. Reconocible en negro y a 16px.
+- **Función en el ecosistema:** identidad de la IP; motor de skins (color y accesorio varían infinito, la silueta base nunca cambia).
+- **Uso potencial:** protagonista jugable por defecto, cara de marca, base de skins.
+- **Qué nunca debe pasar:** cambiar su silueta base; perder los auriculares/estrella como rasgo firma; volverlo un conejo genérico.
 
-**Hoy, nada cambia.** El Physics Lab sigue siendo la prioridad, `ART_DIRECTION.md` sigue gobernando el arte, y el roadmap activo sigue siendo v0.5 → v0.5.1 → v0.6. Este documento solo asegura que, cuando ese roadmap se agote, la siguiente conversación sobre "qué es AmiguRush más allá de la física" empiece desde un lugar coherente — no desde cero.
+### Tejo — osito
+- **Rol:** ancla emocional y anfitrión.
+- **Personalidad:** comfort cálido, tranquilo, confiable.
+- **Silueta:** ancha, tipo tanque.
+- **Función:** guía del tutorial y de la pausa; jugable secundario.
+- **Uso potencial:** anfitrión de onboarding, personaje jugable, figura de tienda.
+- **Qué nunca debe pasar:** que su silueta ancha cambie la hitbox respecto a Pompón (la silueta cambia, la justicia no).
+
+### Estela — unicornio / pegaso
+- **Rol:** figura aspiracional.
+- **Personalidad:** elegante, mágica, deseable.
+- **Silueta:** esbelta, con cuerno/alas.
+- **Función:** tier premium y personaje de eventos especiales.
+- **Uso potencial:** skin premium, evento, figura de monetización.
+- **Qué nunca debe pasar:** regalarla (pierde su valor aspiracional); que sus alas/cuerno rompan la legibilidad de silueta en gameplay.
+
+### Mei — muñequita / chibi girl
+- **Rol:** avatar de comunidad.
+- **Personalidad:** expresiva, social, cercana; la "cara del jugador".
+- **Silueta:** única humanoide del cast.
+- **Función:** identidad social altamente personalizable (pelo, ropa, colores); cara de los clips.
+- **Uso potencial:** avatar personalizable, identidad de perfil, protagonista de contenido social.
+- **Qué nunca debe pasar:** volverse anime genérico; perder coherencia plush/crochet con el resto del cast.
+
+### Madeja — rival
+- **Rol:** rival memético.
+- **Personalidad:** travieso, "villano adorable".
+- **Silueta:** ovillo enredado con carita.
+- **Función:** aparece en el leaderboard como rival a batir; material memético.
+- **Uso potencial:** NPC rival, figura de eventos, sticker/meme de comunidad.
+- **Qué nunca debe pasar:** volverlo amenazante o feo (rompe el tono); que compita con Pompón por el rol de marca.
+
+---
+
+## 8. Regla de personajes (construcción del cast)
+
+Para que todo el cast se sienta de la misma familia:
+- **Proporciones:** cabeza grande, cuerpo pequeño (~1:1.3). Baby / plush.
+- **Ojos:** grandes, con brillo de fieltro, separados, expresivos. Son el ~80% del carisma.
+- **Expresividad:** vía cejas y boca bordadas simples; nada de rasgos realistas.
+- **Textura:** lana mate con puntos de croché visibles. Cero brillo plástico.
+- **Accesorios:** firma e identificables (los auriculares de Pompón); diferencian skins sin alterar la silueta base.
+- **Legibilidad en gameplay:** debe leerse a 16px y en silueta negra; la cara mira a cámara.
+
+**Skin buena vs. skin genérica:** una buena skin cambia color, material y accesorio manteniendo intacta la silueta y la legibilidad — aporta personalidad sin confundir la lectura. Una skin genérica recolorea sin identidad, rompe la silueta, mete brillos plásticos o detalle que se vuelve ruido, o (peor) altera la percepción de la hitbox.
+
+---
+
+## 9. Pilar competitivo / social
+
+Concepto: **el récord como campo de batalla adorable.** La pantalla de récords no es secundaria; convierte un score-attack solitario en rivalidad social y es la razón de volver. Debe sentirse como ternura + prestigio a la vez: el mundo es blando, pero tu posición importa.
+
+Componentes (como dirección visual/producto; sin backend):
+- **Récord personal:** siempre visible (HUD de juego y pantalla de muerte). Es el rival principal.
+- **Ranking global:** la tabla grande; tu fila siempre visible aunque estés lejos.
+- **Ranking semanal:** reset semanal → todos tienen oportunidad recurrente de top.
+- **Ranking de comunidad:** vista filtrada a la comunidad Staryuuki; la pantalla más emocional.
+- **Top 1 / 2 / 3:** podio con jerarquía clara. Top 1 con corona de hilo + marco de estrellas + peana más alta ("rey de la semana"); top 2 y 3 con medallas tejidas plata/bronce y marcos sobrios.
+- **Coronas:** de hilo dorado, tejidas — nunca metal frío.
+- **Medallas:** de lana, plata/bronce; estatus sin romper el cozy.
+- **Banderas:** parches de fieltro pequeños junto al nombre (no banderas realistas).
+- **Nombres de fans:** grandes y legibles. El nombre es el trofeo social.
+- **Botón "intentar batir récord":** CTA omnipresente desde cualquier vista → de vuelta al juego en menos de 1s. El leaderboard nunca es un callejón sin salida.
+- **Retos de stream:** objetivo destacado semanal vinculable a un stream (banner con countdown).
+- **Eventos de Staryuuki:** modo evento con tabla temporal y cosmético exclusivo.
+
+Reglas anti-toxicidad:
+- El récord personal es el rival principal (compites contigo primero).
+- Deltas que motivan ("a 12 puntos"), nunca que humillan; sin contadores de derrotas.
+- Tu fila siempre visible (nunca "fuera de tabla").
+- Sin chat público en el ranking.
+- El semanal reparte oportunidades.
+- La calidez visual del crochet baja la temperatura del pique: úsala a propósito.
+- Insignias, coronas y marcos son **cosméticos, jamás ventaja**.
+
+---
+
+## 10. Loop viral del jugador (7 pasos)
+
+1. **Ve provocación en el ranking.** El ranking de comunidad le dice "estás a 12 puntos de [fan conocido]" — un agravio, no un número pasivo.
+2. **Juega en menos de 1s.** Tap-to-play, cero fricción.
+3. **Falla por poco.** Tensión tipo Geometry Dash; muerte instantánea, legible y percibida como justa (hitbox honesta).
+4. **Retry inmediato.** Un tap desde la pantalla de muerte; sin loading ni interstitial.
+5. **Mejora su score.** La pantalla de muerte grita el número y el delta ("+8 sobre tu récord / -4 para superar a X").
+6. **Comparte / reta.** Al batir récord, un momento clippeable: la criatura celebra, el número estalla, listo para screenshot/clip.
+7. **Vuelve por el evento o el ranking semanal.** Banner/notificación del reto de Staryuuki con countdown → razón recurrente para reabrir. El loop reinicia en el paso 1.
+
+---
+
+## 11. Key Art maestra
+
+La pieza madre del universo: una sola imagen que contiene todo.
+- **Formato:** vertical/cuadrado para portada de tienda y póster, con crop horizontal para banners.
+- **Composición:** capas de profundidad en diagonal.
+- **Personaje principal:** Pompón al frente y centro, en plena carrera/salto (héroe indiscutible).
+- **Personajes secundarios:** el roster (Tejo, Estela, Mei, Madeja) flanqueando a media distancia.
+- **Capas del mundo / mundos visibles:** los seis mundos recediendo en diagonal hacia el fondo (de la pradera al amanecer hasta la cuna estelar de noche) para mostrar el arco completo.
+- **Componente competitivo/social:** una cinta/leaderboard de récord flotante con coronas tejidas.
+- **Coleccionables:** ovillos y estrellas de fieltro salpicados como partículas de recompensa.
+- **Tono emocional:** cálido, épico-pero-adorable, aspiracional.
+- **Objetivo comunicativo:** dejar claro en un vistazo que AmiguRush es un MUNDO con profundidad y una COMPETICIÓN con estatus, no un mini-juego.
+- **Uso futuro:** pieza madre para ilustración, marketing, UI y futuras implementaciones.
+
+---
+
+## 12. Art Direction Lock
+
+**Siempre (fijo):**
+- Pastel cálido, saturación baja-media.
+- Materiales textiles dominantes.
+- Costura punteada como firma.
+- Volumen blando + sombra suave.
+- Bordes redondeados.
+- Legibilidad y hitbox honesta por encima de todo.
+
+**Puede variar:**
+- Paleta dominante por mundo.
+- Material y mood por mundo.
+- Color y accesorio de criaturas.
+- Densidad decorativa (dentro de un límite).
+- Intensidad de luz por ambientación.
+- Props y coleccionables temáticos.
+
+**No puede cambiar sin QA:**
+- La silueta base del héroe.
+- La igualdad de hitbox entre personajes jugables.
+- El contraste mínimo de obstáculos contra el fondo.
+- La zona muerta decorativa alrededor del gap.
+
+**Qué lo hace ver barato:** saturación de chicle; brillos plásticos; mezclar flat con volumétrico sin criterio; textura tan detallada que se vuelve ruido.
+
+**Qué mata la legibilidad:** outlines negros duros; texto pequeño sobre lana sin placa/halo; decoración que invade el gameplay; bajo contraste en mundos oscuros.
+
+**Qué contradice la marca:** medallas/coronas de metal frío; un cast que deriva a anime genérico o a muñeco rígido; obstáculos que mienten sobre la colisión.
+
+---
+
+## 13. Roadmap creativo seguro
+
+1. **Universe Bible** — este documento. Fuente de verdad del universo, cast y pilar competitivo.
+2. **Visual Design Bible** — sistema visual (paleta, tipografía, UI, componentes). Ya existe.
+3. **Reconciliation docs** — arbitra el conflicto de obstáculos (agujas vs. columnas vs. híbrido).
+4. **UI Kit** — componentes HTML/CSS + tokens.
+5. **Community Competition Layer** — spec de la capa competitiva/social (dirección, sin backend).
+6. **Leaderboard prototype** — valida la pantalla de muerte/récord y el gancho de retry/compartir.
+7. **Obstacle prototype** — valida el obstáculo híbrido (hitbox justa en movimiento y en cámara lenta).
+8. **Gameplay visual prototype** — personaje + obstáculo validado + parallax + HUD de score + feel del tap. Sin tienda.
+9. **Assets reales** — tiles de lana, frames de animación, props, skins base.
+10. **Menús finales** — inicio, pausa, cómo jugar, leaderboard completo.
+11. **Store / records / settings** — al final. Las skins nunca afectan hitbox ni legibilidad.
+
+Principio del roadmap: la capa competitiva y los prototipos de validación (obstáculo + leaderboard) van **antes** de invertir en assets caros.
+
+---
+
+## 14. Documentos recomendados para el repo
+
+**Necesarios ahora:**
+- `UNIVERSE_BIBLE.md` — este documento; fuente de verdad del universo, cast y competición.
+- `VISUAL_DESIGN_BIBLE.md` — el sistema visual como referencia.
+- `DESIGN_RECONCILIATION.md` — decisión sobre el conflicto de obstáculos.
+- `COMMUNITY_COMPETITION_LAYER.md` — el pilar social documentado como dirección.
+- `VIRAL_GAME_LOOP.md` — los 7 pasos del loop.
+
+**Necesarios después (al prototipar):**
+- `OBSTACLE_PROTOTYPE_SPEC.md` — al arrancar el prototipo de obstáculo.
+- `LEADERBOARD_SPEC.md` — al prototipar la pantalla de muerte/ranking (aquí entra, más tarde, el backend).
+- `UI_KIT_SPEC.md` — al construir el UI Kit.
+
+**Opcionales:**
+- `WORLDS_SPEC.md` — si se quiere desacoplar el detalle de mundos del Universe Bible cuando crezca.
+- `CHARACTER_SHEET.md` — turnaround y frames cuando se produzca arte real.
+
+Regla: documenta ahora lo que **dirige decisiones**; deja para después lo que **especifica implementación**.
+
+---
+
+## 15. Decisión final
+
+- **¿Complementa o reemplaza `ART_DIRECTION.md`?** Lo **complementa**, no lo reemplaza. `ART_DIRECTION.md` sigue siendo el documento canónico de decisiones aprobadas; el Universe Bible es el north star de IP que las alimenta. Una decisión del Universe Bible solo se promueve a `ART_DIRECTION.md` tras validarse (p. ej. el obstáculo híbrido, después del prototipo).
+- **Qué debe pasar antes de tocar código:** aprobar este documento; documentar la Community Competition Layer y el Viral Game Loop; resolver el conflicto de obstáculos en el Reconciliation doc; dejar `ART_DIRECTION.md` con una nota de "obstáculos en revisión".
+- **Qué debe congelarse:** los cambios de obstáculo en el Physics Lab (hasta que el prototipo decida) y cualquier alteración de la silueta del héroe o de la igualdad de hitbox.
+- **Próximo paso correcto:** redactar `COMMUNITY_COMPETITION_LAYER.md` + `VIRAL_GAME_LOOP.md` y arrancar, en paralelo y aislados, los prototipos de obstáculo híbrido y de leaderboard/pantalla de muerte — antes de invertir en assets reales. El código de producción no se toca todavía.
